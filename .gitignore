@@ -1,0 +1,13 @@
+node_modules/
+.next/
+.env
+.env.local
+data/
+# internal planning docs (not for the public repo)
+docs/PRD.md
+docs/ARCHITECTURE.md
+docs/DESIGN.md
+docs/TASKS.md
+memory.md
+AGENTS.md
+CLAUDE.md
