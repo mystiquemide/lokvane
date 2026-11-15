@@ -1,23 +1,5 @@
 [
   {
-    "id": "628a516f",
-    "text": "Do not penalize a legitimate German product term merely because it differs from a literal English translation when it is natural in e-commerce usage.",
-    "sourceEvalId": "cmwi4mrfv000207jvgyrsvixb",
-    "createdAt": "2026-11-15T17:52:07.326Z"
-  },
-  {
-    "id": "1952bc45",
-    "text": "Flag untranslated or poorly localized search terms in German Etsy listings when they reduce native-sounding discoverability for German buyers.",
-    "sourceEvalId": "cmwi4vhgk000d07jvpen7an6s",
-    "createdAt": "2026-11-15T18:00:12.582Z"
-  },
-  {
-    "id": "fa3afb0f",
-    "text": "Check size or measurement values against German market conventions and convert them when a U.S. format would confuse buyers.",
-    "sourceEvalId": "cmwi4vhib000e07jv705wmwaq",
-    "createdAt": "2026-11-15T18:00:12.582Z"
-  },
-  {
     "id": "278f319f",
     "text": "Flag mixed-language product phrases that sound unnatural in German, even if the underlying translation is broadly correct.",
     "sourceEvalId": "cmwi5kh1p000p07jv2irrjgd0",
@@ -70,5 +52,23 @@
     "text": "Flag unnatural German phrasing even when the core translation is correct, if the wording would sound awkward to native German e-commerce buyers.",
     "sourceEvalId": "cmwi5qb4z000008kxpz3yh7zg",
     "createdAt": "2026-11-15T18:19:24.754Z"
+  },
+  {
+    "id": "4f2dd7f8",
+    "text": "Do not penalize a German Etsy translation for clarifying source-market sizing with an added origin label when the original measurement is preserved accurately.",
+    "sourceEvalId": "cmwi6gwuv000308kx3n7wn825",
+    "createdAt": "2026-11-15T18:41:30.184Z"
+  },
+  {
+    "id": "42cbb444",
+    "text": "Do not lower factual accuracy for using common English loanwords or search tags in German Etsy listings when they are natural in local e-commerce usage and do not distort the product meaning.",
+    "sourceEvalId": "cmwi6gwuv000308kx3n7wn825",
+    "createdAt": "2026-11-15T18:41:30.184Z"
+  },
+  {
+    "id": "9c80b9cc",
+    "text": "Penalty severe mistranslations that turn a source term into an unrelated or dangerous German meaning, especially when the error misleads buyers about the product.",
+    "sourceEvalId": "cmwi6gwvd000408kx9q5vi3mi",
+    "createdAt": "2026-11-15T18:41:30.184Z"
   }
 ]

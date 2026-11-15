@@ -72,5 +72,20 @@
       "Flag unnatural German phrasing even when the core translation is correct, if the wording would sound awkward to native German e-commerce buyers."
     ],
     "at": "2026-11-15T18:19:24.756Z"
+  },
+  {
+    "round": 6,
+    "listingTitle": "Dainty Sterling Silver Stacking Ring | Size 7 | Minimalist Everyday Jewelry",
+    "baselineEvalId": "cmwi6gwvd000408kx9q5vi3mi",
+    "fixEvalId": "cmwi6gwuv000308kx3n7wn825",
+    "baselineScore": 40,
+    "fixScore": 94,
+    "rulesUsed": 12,
+    "rulesAdded": [
+      "Do not penalize a German Etsy translation for clarifying source-market sizing with an added origin label when the original measurement is preserved accurately.",
+      "Do not lower factual accuracy for using common English loanwords or search tags in German Etsy listings when they are natural in local e-commerce usage and do not distort the product meaning.",
+      "Penalty severe mistranslations that turn a source term into an unrelated or dangerous German meaning, especially when the error misleads buyers about the product."
+    ],
+    "at": "2026-11-15T18:41:30.184Z"
   }
 ]
