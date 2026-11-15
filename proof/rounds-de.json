@@ -102,5 +102,20 @@
       "Do not give a perfect factual accuracy score when a German Etsy translation preserves most meaning but still misses important localization nuances such as expected local terminology."
     ],
     "at": "2026-11-15T19:23:47.127Z"
+  },
+  {
+    "round": 8,
+    "listingTitle": "Botanical Wall Art Print | 8x10 inch | Unframed | Instant Mood Booster for Your Home Office",
+    "baselineEvalId": "cmwi9gyzr000007jymx2ltq5x",
+    "fixEvalId": "cmwi9gzck000007jm0n9xxu8h",
+    "baselineScore": 80,
+    "fixScore": 96,
+    "rulesUsed": 12,
+    "rulesAdded": [
+      "Lower factual accuracy or instruction adherence when a German Etsy listing contains clearly awkward literal phrasing that would sound unnatural to native buyers, even if the core meaning is preserved.",
+      "Do not penalize German Etsy listings for common English search tags or loanwords that are natural in local e-commerce use and do not change the product meaning.",
+      "Do not give a perfect score when a German Etsy listing still contains minor but visible language issues in tags or metadata, such as mixed-language phrasing or obvious grammar errors."
+    ],
+    "at": "2026-11-15T20:04:07.390Z"
   }
 ]

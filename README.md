@@ -80,7 +80,7 @@ We haven't validated pricing with paying users. The points above are a model, no
 
 ## Measured results (proof run, November 15, 2026)
 
-Seven rounds were run live against SERV Reasoning and the Reppo Evaluation API. Each round scored Etsy's auto-translation and the Lokvane fix for the same listing. Every score below is a real Reppo verdict, and each eval ID can be looked up.
+Eight rounds were run live against SERV Reasoning and the Reppo Evaluation API. Each round scored Etsy's auto-translation and the Lokvane fix for the same listing. Every score below is a real Reppo verdict, and each eval ID can be looked up.
 
 | Round | Listing (example) | Playbook rules in use | Auto-translation score | Lokvane fix score | Gain | Reppo eval IDs (auto / fix) |
 |---|---|---|---|---|---|---|
@@ -91,17 +91,18 @@ Seven rounds were run live against SERV Reasoning and the Reppo Evaluation API. 
 | 5 | Vintage 19-piece glassware set (repeat) | 11 | 45 | 100 | +55 | `cmwi5qb4z000008kxpz3yh7zg` / `cmwi5qaql000207l5em65kv5t` |
 | 6 | Sterling silver stacking ring (repeat, run on production) | 12 | 40 | 94 | +54 | `cmwi6gwvd000408kx9q5vi3mi` / `cmwi6gwuv000308kx3n7wn825` |
 | 7 | Hand-poured soy candle (repeat) | 12 | 63 | 93 | +30 | `cmwi817a8000108l22hb637sz` / `cmwi817ay000208l2q3gyhfx0` |
+| 8 | Botanical wall art print (repeat, run on production) | 12 | 80 | 96 | +16 | `cmwi9gyzr000007jymx2ltq5x` / `cmwi9gzck000007jm0n9xxu8h` |
 
 Raw data: [proof/rounds-de.json](proof/rounds-de.json) and [proof/playbook-de.json](proof/playbook-de.json).
 
 **What this shows:**
-- Two listings were fixed twice from the same input. Glassware: **80** with an empty playbook, **100** with 11 learned rules. Ring: **76** with 3 rules, **94** with 12 rules.
-- Rounds with 5 or more rules (rounds 3 to 7) beat the auto-translation by 18 to 55 points. Rounds with 0 to 3 rules beat it by 2 to 4.
+- Four listings were fixed twice from the same input. Glassware: **80** with an empty playbook, **100** with 11 learned rules. Ring: **76** with 3 rules, **94** with 12 rules. Wall print: **92** with 8 rules, **96** with 12 rules.
+- Rounds with 5 or more rules (rounds 3 to 8) beat the auto-translation by 18 to 55 points. Rounds with 0 to 3 rules beat it by 2 to 4.
 
 **What it does not show:**
 - Reppo scores vary between runs. The identical glassware auto-translation scored 76 in round 1 and 45 in round 5, and the identical ring auto-translation scored 74 then 40, so part of the large gaps in rounds 5 and 6 comes from the panel, not from Lokvane. The fix-to-fix comparisons on the same listing (80 → 100 and 76 → 94) are the cleaner signal.
 - The candle listing was also fixed twice and did not improve: 95 with 5 rules in round 3, 93 with 12 rules in round 7. More rules don't guarantee a higher score on every listing.
-- Seven rounds is a small sample. Reppo scores measure evaluator-judged listing quality, not sales.
+- Eight rounds is a small sample. Reppo scores measure evaluator-judged listing quality, not sales.
 
 ---
 
@@ -166,7 +167,7 @@ English listing + Etsy auto-translation
 
 ![Lokvane product page: hero with a recorded round 6 fix, errors and Reppo scores](docs/screens/00-landing.png)
 
-The product page at `/` opens with the problem and shows a real recorded run in the hero: production round 6, the ring listing, with the 6 errors SERV Reasoning found and the Reppo scores of 40 for Etsy's version and 94 for the fix. The data comes from [proof/round-6-ring-fix.json](proof/round-6-ring-fix.json). Further down: the problem with real examples, how the loop works with a real playbook rule, a chart of all seven recorded rounds, and the sponsor stack.
+The product page at `/` opens with the problem and shows a real recorded run in the hero: production round 6, the ring listing, with the 6 errors SERV Reasoning found and the Reppo scores of 40 for Etsy's version and 94 for the fix. The data comes from [proof/round-6-ring-fix.json](proof/round-6-ring-fix.json). Further down: the problem with real examples, how the loop works with a real playbook rule, a chart of all eight recorded rounds, and the sponsor stack.
 
 ### 1. Errors and the corrected listing
 
@@ -196,7 +197,7 @@ Left: the Germany playbook. Each rule came from a Reppo evaluator critique and s
 
 ## Judge path (5 minutes)
 
-1. **Open the product page:** https://lokvane.midelabs.xyz. The hero shows a real recorded run, and the results chart plots all seven rounds.
+1. **Open the product page:** https://lokvane.midelabs.xyz. The hero shows a real recorded run, and the results chart plots all eight rounds.
 2. **Open the tool:** https://lokvane.midelabs.xyz/check. The playbook and round history from the proof run load right away.
 3. **Check the proof:** look at the round history (bottom right). Fix scores rise as more rules are in use. The same glassware listing goes from 80 to 100, and the same ring listing from 76 to 94. Every bar has a Reppo eval ID.
 4. **Trace one rule:** pick a playbook rule (bottom left), note its Reppo eval ID, and find that ID in [proof/rounds-de.json](proof/rounds-de.json). It's the round whose critique produced the rule.

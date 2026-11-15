@@ -1,23 +1,5 @@
 [
   {
-    "id": "185ac209",
-    "text": "Flag unnatural German phrasings even when the translation is otherwise accurate, and lower the score if they would sound awkward to native buyers.",
-    "sourceEvalId": "cmwi5ochi000107l5vols0yb3",
-    "createdAt": "2026-11-15T18:17:30.289Z"
-  },
-  {
-    "id": "e901213d",
-    "text": "Treat missing metric conversions as a localization error when German buyers would expect centimeter-based measurements instead of U.S. units.",
-    "sourceEvalId": "cmwi5ochi000107l5vols0yb3",
-    "createdAt": "2026-11-15T18:17:30.289Z"
-  },
-  {
-    "id": "8241978b",
-    "text": "Penalize leftover English or mixed-language search terms in German Etsy listings when they are not clearly appropriate for local e-commerce use.",
-    "sourceEvalId": "cmwi5ocgp000007l5c8nksrp9",
-    "createdAt": "2026-11-15T18:17:30.289Z"
-  },
-  {
     "id": "da5b4270",
     "text": "Penalize catastrophic mistranslations that turn a source term into a dangerous or unrelated German meaning, especially when the error would mislead buyers.",
     "sourceEvalId": "cmwi5qb4z000008kxpz3yh7zg",
@@ -70,5 +52,23 @@
     "text": "Do not give a perfect factual accuracy score when a German Etsy translation preserves most meaning but still misses important localization nuances such as expected local terminology.",
     "sourceEvalId": "cmwi817ay000208l2q3gyhfx0",
     "createdAt": "2026-11-15T19:23:47.125Z"
+  },
+  {
+    "id": "d302d467",
+    "text": "Lower factual accuracy or instruction adherence when a German Etsy listing contains clearly awkward literal phrasing that would sound unnatural to native buyers, even if the core meaning is preserved.",
+    "sourceEvalId": "cmwi9gyzr000007jymx2ltq5x",
+    "createdAt": "2026-11-15T20:04:07.379Z"
+  },
+  {
+    "id": "51736d24",
+    "text": "Do not penalize German Etsy listings for common English search tags or loanwords that are natural in local e-commerce use and do not change the product meaning.",
+    "sourceEvalId": "cmwi9gzck000007jm0n9xxu8h",
+    "createdAt": "2026-11-15T20:04:07.379Z"
+  },
+  {
+    "id": "1a82c063",
+    "text": "Do not give a perfect score when a German Etsy listing still contains minor but visible language issues in tags or metadata, such as mixed-language phrasing or obvious grammar errors.",
+    "sourceEvalId": "cmwi9gzck000007jm0n9xxu8h",
+    "createdAt": "2026-11-15T20:04:07.379Z"
   }
 ]
