@@ -1,1 +1,298 @@
-# openserv-2-hack
+# Lokvane
+
+Lokvane finds what Etsy's auto-translation got wrong in each market, fixes the listing, and learns that market's rules from independent Reppo verdicts. Each listing comes out better than the one before it.
+
+**Live app:** https://lokvane.midelabs.xyz
+**Demo video:** _link added at submission_
+**X post:** _link added at submission_
+**Track:** Reppo (SERV Hackathon Edition 02 by OpenServ)
+
+---
+
+## The problem
+
+Etsy automatically machine-translates every listing into the buyer's language ([Etsy Help](https://help.etsy.com/hc/articles/360000343048)). Sellers can't read most of those languages, so they can't check what buyers actually see. They report errors that change what is being sold:
+
+- A vintage **19-piece** glassware set shown to buyers as a set **from the 19th century** ([Etsy Community](https://community.etsy.com/t5/Technical-Issues/the-automatic-translation-makes-typical-AI-hallucination/m-p/147084237)).
+- Product names and shop names translated into unrelated words, and English titles replaced by translations ([Etsy Community](https://community.etsy.com/t5/Technical-Issues/Etsy-please-stop-using-AI/m-p/149053052)).
+- English words that mean something else in the target language. In German, **"Gift" means poison**, so "Perfect Gift for Her" becomes "Perfect Poison for Her" ([Translated.com guide](https://translated.com/resources/marketplace-seller-translation-guide)).
+
+Etsy's own guidance is that manual translations read more naturally and rank better in local search. Most small sellers can't afford a translator for every market they ship to, and a translator still won't tell them which local search terms buyers use.
+
+Generic AI translation has the same weakness Etsy's does. It grades its own work, so nothing tells it when it's wrong, and it makes the same mistake on the next listing.
+
+## The solution
+
+Lokvane is a localization agent for marketplace sellers. Germany is the first market.
+
+1. The seller pastes the English listing and Etsy's German auto-translation.
+2. **SERV Reasoning** compares them and lists every error: what the machine wrote, why it misleads a German buyer, and the fix. It then writes a corrected German listing with local search tags.
+3. **Reppo**, an independent evaluator panel, scores the auto-translation and the Lokvane fix side by side. Lokvane never scores itself.
+4. Lokvane reads the evaluators' critiques and turns them into **playbook rules** for that market. Every rule records the Reppo eval ID that produced it.
+5. The next listing is fixed with the updated playbook. The round history shows whether the scores went up.
+
+The result is a per-market playbook built from outside judgment rather than self-assessment, and it improves with every listing.
+
+## About
+
+Lokvane is a solo build for SERV Hackathon Edition 02. It started on November 15, 2026, and everything in this repository was built during the hackathon: the SERV Reasoning fixing pipeline, the Reppo evaluation client, the learning loop, the web app, the production deployment, and the recorded proof run.
+
+The name is a coined word. It hints at "locale" and has no ties to any existing product.
+
+## Tracks
+
+| Track | Why Lokvane fits |
+|---|---|
+| **Reppo track:** reliable agents that turn real-time feedback into measurable improvements | Every fix is scored by the Reppo Evaluation API. Reppo critiques become playbook rules. Scores are tracked per round and stored with Reppo eval IDs, so the improvement can be checked. |
+
+SERV Reasoning, which the hackathon requires for every track, generates every fix and every playbook rule.
+
+---
+
+## Judging criteria
+
+The hackathon judges three things: creativity, user readiness, and revenue potential. This section maps each one to evidence in this repo.
+
+### Creativity
+
+- **An agent that doesn't grade its own homework.** Most self-improving agents critique themselves. Lokvane learns only from an independent panel (Reppo), so its rules come from judgment outside the model that made the mistake.
+- **Traceable learning.** Every playbook rule shows the Reppo eval ID that taught it ([proof/playbook-de.json](proof/playbook-de.json)). You can follow any rule back to the verdict and critique that created it.
+- **A new use for evaluation.** Reppo is usually a gate that blocks bad output before it ships. Lokvane uses the verdict as training signal, so each evaluation makes the next listing better.
+
+### User readiness
+
+- **Live in production** at https://lokvane.midelabs.xyz, on a Dokploy server behind HTTPS.
+- **One screen, one action.** Paste two texts and press one button. No account, no setup, no Etsy login.
+- **Results a seller can act on.** Each error is shown as wrong phrase → corrected phrase with a one-line explanation in English, followed by a ready-to-paste German title, description and 13 tags.
+- **Honest states.** The UI shows when the Reppo panel is reviewing (with elapsed time), failed evaluations, missing API keys, and a notice that Reppo evaluations are public.
+
+### Revenue potential
+
+- **Who pays:** Etsy sellers who ship internationally and already pay for listing tools such as eRank or Marmalead. Lokvane fills a gap those tools leave: it checks the translation buyers actually see in each market.
+- **Pricing model:** per fixed listing, or a monthly plan per market. The playbook is the product. It gets better with every listing, and a competitor starting today would start with an empty one.
+- **Unit cost:** one SERV Reasoning call per fix, one per learning step, and two Reppo evaluations per round at 440 Reppo credits each. Cost per listing is a few model calls, with no human reviewer.
+- **Expansion:** markets are config ([lib/markets.ts](lib/markets.ts)). France and Japan are defined but not yet enabled in the UI. The same loop works for Shopify, Amazon handmade and eBay listings.
+
+We haven't validated pricing with paying users. The points above are a model, not traction.
+
+---
+
+## Measured results (proof run, November 15, 2026)
+
+Five rounds were run live against SERV Reasoning and the Reppo Evaluation API. Each round scored Etsy's auto-translation and the Lokvane fix for the same listing. Every score below is a real Reppo verdict, and each eval ID can be looked up.
+
+| Round | Listing (sample) | Playbook rules in use | Auto-translation score | Lokvane fix score | Gain | Reppo eval IDs (auto / fix) |
+|---|---|---|---|---|---|---|
+| 1 | Vintage 19-piece glassware set | 0 | 76 | 80 | +4 | `cmwi4mrur000207l2oatnwmyg` / `cmwi4mrfv000207jvgyrsvixb` |
+| 2 | Sterling silver stacking ring | 3 | 74 | 76 | +2 | `cmwi4vhgk000d07jvpen7an6s` / `cmwi4vhib000e07jv705wmwaq` |
+| 3 | Hand-poured soy candle | 5 | 77 | 95 | +18 | `cmwi5kh1x000q07jvqvj3dfuu` / `cmwi5kh1p000p07jv2irrjgd0` |
+| 4 | Botanical wall art print | 8 | 73 | 92 | +19 | `cmwi5ochi000107l5vols0yb3` / `cmwi5ocgp000007l5c8nksrp9` |
+| 5 | Vintage 19-piece glassware set (repeat) | 11 | 45 | 100 | +55 | `cmwi5qb4z000008kxpz3yh7zg` / `cmwi5qaql000207l5em65kv5t` |
+
+Raw data: [proof/rounds-de.json](proof/rounds-de.json) and [proof/playbook-de.json](proof/playbook-de.json).
+
+**What this shows:**
+- The same glassware listing was fixed twice. With an empty playbook the fix scored **80**. With 11 learned rules it scored **100**.
+- Rounds with 5 or more rules (3 to 5) beat the auto-translation by 18 to 55 points. Rounds with 0 to 3 rules beat it by 2 to 4.
+
+**What it does not show:**
+- Reppo scores vary between runs. The identical glassware auto-translation scored 76 in round 1 and 45 in round 5, so part of the +55 gap comes from the panel, not from Lokvane. The fix-to-fix comparison on the same listing (80 → 100) is the cleaner signal.
+- Five rounds is a small sample. Reppo scores measure evaluator-judged listing quality, not sales.
+
+---
+
+## How SERV Reasoning is used
+
+SERV Reasoning is the only model provider in Lokvane, and it does every generation step. Remove it and nothing is produced.
+
+| Step | Where | What SERV Reasoning does | Output |
+|---|---|---|---|
+| Error detection and fix | [app/api/fix/route.ts](app/api/fix/route.ts) | Compares the English original with Etsy's German machine translation, applies every current playbook rule, lists each error with the reason it misleads a German buyer, and writes the corrected listing | Strict JSON: `errors[]` (machine phrase, problem, fix) and `fixed` (title, description, tags) |
+| Rule learning | [app/api/learn/route.ts](app/api/learn/route.ts) | Reads the Reppo evaluators' critiques for both versions, drops anything already covered or too generic, and writes up to 3 new imperative rules, each citing its source eval ID | Strict JSON: `rules[]` (text, sourceEvalId) |
+
+Integration details ([lib/serv.ts](lib/serv.ts)):
+- Endpoint: `https://inference-api.openserv.ai/v1` through the OpenAI SDK, which SERV Reasoning is compatible with.
+- Model: `gpt-5.4-mini`, configurable with `SERV_MODEL`.
+- **Schema-forced outputs:** every call uses `response_format: json_schema` with `strict: true`. During the build, free-form prompting returned the wrong field names. Strict schemas fixed that, so both routes always return a shape the app can use.
+- Listing text is passed inside delimited blocks and labeled as data, not instructions.
+
+## How Reppo is used
+
+Reppo is the only source of scores and the only source of learning signal. Remove it and Lokvane has nothing to learn from and no way to show improvement.
+
+| Step | Where | What Reppo does |
+|---|---|---|
+| Independent scoring | [app/api/evaluate/route.ts](app/api/evaluate/route.ts) | Each round submits two evaluations (`taskType: "response"`): Etsy's auto-translation and the Lokvane fix, each paired with the original and the localization task |
+| Verdict polling | [app/api/evaluate/[id]/route.ts](app/api/evaluate/[id]/route.ts) | Polls until `COMPLETED` or `FAILED` and returns score, decision, confidence, route, reason and rubric scores |
+| Learning signal | [lib/reppo.ts](lib/reppo.ts) `critiques()` | Pulls each evaluator's written reasoning from the verdict `trace`. These critiques are the only input to rule learning |
+| Proof | [proof/](proof/) | Every round stores both eval IDs and every rule stores its source eval ID |
+
+Integration details:
+- Endpoints: `POST https://eval.reppo.xyz/api/v1/agents/evals` and `GET /api/v1/agents/evals/{id}`, with Bearer auth.
+- Both evaluations in a round run in parallel. Verdicts took 1 to 7 minutes during the proof run.
+- Failed evaluations are shown in the UI and aren't charged by Reppo.
+- Reppo evaluations are public, so Lokvane only sends public listing text. The UI says this next to the input.
+
+### The loop
+
+```
+English listing + Etsy auto-translation
+              │
+              ▼
+   SERV Reasoning: find errors, write fix  ◄──── Germany playbook (rules + source eval IDs)
+              │                                              ▲
+              ▼                                              │
+   Reppo: score auto-translation and fix                     │
+              │                                              │
+              ▼                                              │
+   Evaluator critiques from Reppo trace                      │
+              │                                              │
+              ▼                                              │
+   SERV Reasoning: distill new rules ────────────────────────┘
+              │
+              ▼
+   Round log: both scores + both eval IDs
+```
+
+---
+
+## Screens
+
+### 1. Errors and the corrected listing
+
+![Lokvane: errors found in Etsy's German auto-translation, with fixes and the corrected listing](docs/screens/01-errors-and-fix.png)
+
+Left: the English original and Etsy's German auto-translation as pasted by the seller (sample listing). Right: every error SERV Reasoning found. The machine's phrase is struck through in red, the correction is in green, and below each one is a plain-English explanation of why it would mislead or put off a German buyer. Below the errors is the full corrected listing, ready to paste into Etsy: German title, description and 13 local search tags. The footer line shows how many playbook rules were applied and which SERV Reasoning model was used.
+
+### 2. Reppo panel reviewing
+
+![Lokvane while the Reppo evaluator panel is reviewing both versions](docs/screens/02-reviewing.png)
+
+After the fix, both versions go to Reppo. The button shows the live state and elapsed time while the independent panel reviews.
+
+### 3. Independent scores, side by side
+
+![Reppo scores for Etsy's auto-translation and the Lokvane fix, with eval IDs](docs/screens/03-reppo-scores.png)
+
+Left: Reppo's score for Etsy's auto-translation. Right: Reppo's score for the Lokvane fix, with the point difference. Each card shows Reppo's decision, confidence, recommended route and written reason, plus the full Reppo eval ID so the verdict can be checked.
+
+### 4. Learned playbook and round history
+
+![Germany playbook rules with source Reppo eval IDs, and round history with scores](docs/screens/04-playbook-and-rounds.png)
+
+Left: the Germany playbook. Each rule came from a Reppo evaluator critique and shows the eval ID that taught it. Rules learned in the latest round are highlighted. Right: every round so far, with the listing, how many rules were in use, and two bars per round: the auto-translation score (light) and the Lokvane fix score (dark), each with its Reppo eval ID.
+
+---
+
+## Judge path (5 minutes)
+
+1. **Open the live app:** https://lokvane.midelabs.xyz. The playbook and round history from the proof run load right away.
+2. **Check the proof:** look at the round history (bottom right). Fix scores rise as more rules are in use, and the same glassware listing goes from 80 to 100. Every bar has a Reppo eval ID.
+3. **Trace one rule:** pick a playbook rule (bottom left), note its Reppo eval ID, and find that ID in [proof/rounds-de.json](proof/rounds-de.json). It's the round whose critique produced the rule.
+4. **Run it yourself:** pick a sample listing from the dropdown, or paste your own English listing and a German translation, then press **Check and fix for Germany**. The errors appear in a few seconds. The Reppo verdicts take 1 to 7 minutes, then new rules appear, highlighted.
+5. **Check the sponsor code:** SERV Reasoning in [lib/serv.ts](lib/serv.ts) and [app/api/fix/route.ts](app/api/fix/route.ts). Reppo in [lib/reppo.ts](lib/reppo.ts) and [app/api/evaluate/route.ts](app/api/evaluate/route.ts). The learning loop in [app/api/learn/route.ts](app/api/learn/route.ts).
+
+---
+
+## What we built
+
+| Part | Files | What it does |
+|---|---|---|
+| SERV Reasoning client | `lib/serv.ts` | OpenAI-SDK client for SERV Reasoning with strict JSON schemas for both generation steps |
+| Reppo client | `lib/reppo.ts` | Submits evaluations, reads verdicts, pulls evaluator critiques from the trace, and builds the evaluation prompt for a market |
+| Fix API | `app/api/fix/route.ts` | Error detection and corrected listing, with the current playbook applied |
+| Evaluate API | `app/api/evaluate/` | Submits a listing to Reppo and polls the verdict |
+| Learn API | `app/api/learn/route.ts` | Turns Reppo critiques into rules with source eval IDs and logs the round |
+| State API and store | `app/api/state/route.ts`, `lib/store.ts` | Playbook and round history per market, seeded from the proof run |
+| Web app | `app/page.tsx` | Single-screen UI: input, error diff, corrected listing, score cards, playbook, round history |
+| Markets | `lib/markets.ts` | Market config (Germany live, France and Japan defined) |
+| Sample listings | `lib/samples.json` | Four sample Etsy-style listings with machine translations containing error types sellers report. These are written for testing and are not real shops |
+| Round runner | `scripts/round.mjs` | Runs a full round (fix, two Reppo evaluations, learn) against any deployment from the command line |
+| Proof data | `proof/` | Recorded rounds and playbook from the live proof run |
+| Deployment | `Dockerfile` | Production image on Node 22, deployed with Dokploy |
+
+## Built with
+
+- **[SERV Reasoning](https://docs.openserv.ai/serv-reasoning/introduction.md)** (OpenServ): all generation, with strict JSON schema outputs
+- **[Reppo Evaluation API](https://eval.reppo.xyz/agents.md)**: independent scoring and the critiques the agent learns from
+- **Next.js 16** (App Router, Turbopack) and **React 19**
+- **TypeScript 5**
+- **Tailwind CSS 4**
+- **OpenAI Node SDK**, pointed at SERV Reasoning
+- **Docker** (Node 22) and **Dokploy** for deployment, with Let's Encrypt HTTPS
+
+---
+
+## Run it locally
+
+Requires Node 22 or newer, a SERV Reasoning API key from [console.openserv.ai](https://console.openserv.ai), and a Reppo API key from [eval.reppo.xyz/api-key](https://eval.reppo.xyz/api-key).
+
+```bash
+git clone https://github.com/mystiquemide/openserv-2-hack.git lokvane
+```
+
+```bash
+cd lokvane && npm install
+```
+
+```bash
+cp .env.example .env.local
+```
+
+Set `SERV_API_KEY` and `REPPO_API_KEY` in `.env.local`, then start the app:
+
+```bash
+npm run dev
+```
+
+Open http://localhost:3000. To run one full round from the command line against a running app:
+
+```bash
+node scripts/round.mjs candle http://localhost:3000
+```
+
+Sample IDs: `glassware`, `ring`, `candle`, `print`.
+
+### Environment variables
+
+| Variable | Required | Purpose |
+|---|---|---|
+| `SERV_API_KEY` | Yes | SERV Reasoning API key |
+| `REPPO_API_KEY` | Yes | Reppo Evaluation API key |
+| `SERV_MODEL` | No | SERV Reasoning model, defaults to `gpt-5.4-mini` |
+
+### API
+
+| Method | Path | Body | Returns |
+|---|---|---|---|
+| `POST` | `/api/fix` | `{ original, machine, marketKey }` | `{ errors[], fixed, rulesUsed, model }` |
+| `POST` | `/api/evaluate` | `{ original, candidate, marketKey }` | `{ evalId, status }` |
+| `GET` | `/api/evaluate/{evalId}` | | `{ status, score, decision, confidence, route, reason, rubric, critiques[] }` |
+| `POST` | `/api/learn` | `{ marketKey, listingTitle, baselineEvalId, fixEvalId, rulesUsed }` | `{ added[], playbook[], rounds[] }` |
+| `GET` | `/api/state?market=de` | | `{ playbook[], rounds[] }` |
+
+---
+
+## Limitations
+
+- **Paste-in only.** Lokvane doesn't connect to Etsy yet, so the seller copies the listing and the auto-translation in, and copies the fix back out.
+- **One live market.** Germany is enabled. France and Japan are configured but not enabled in the UI.
+- **Reppo scores are a quality signal, not a sales signal.** They measure how an independent panel rates the listing. Sales lift is untested.
+- **Reppo scores vary between runs**, as the measured results show. Small differences between single rounds shouldn't be read as real changes.
+- **Reppo evaluations are public.** Only send listing text that is already public.
+- **Shared playbook.** The live demo has one Germany playbook for all visitors. Per-seller playbooks would come with accounts.
+- **Some rules overlap.** The rule learner skips rules already in the playbook, but similar wording can still slip through. The playbook is capped at 12 rules, and the oldest drop off first.
+- **Sample listings.** The four built-in listings were written for testing and are labeled as samples in the UI. The errors in them are types sellers report, not copies of specific real listings.
+
+## Submission checklist
+
+- [x] Public code repository (this repo)
+- [x] Live demo link: https://lokvane.midelabs.xyz
+- [ ] Demo video: _link added at submission_
+- [x] Write-up: what Lokvane does (The solution), how it uses SERV Reasoning (How SERV Reasoning is used), track entered (Tracks), what was built during the hackathon (About, What we built)
+- [ ] X post: _link added at submission_
+- [x] SERV Reasoning is part of the build
+
+## License
+
+[MIT](LICENSE)
