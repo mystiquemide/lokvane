@@ -140,23 +140,51 @@ Integration details:
 
 ### The loop
 
+```mermaid
+flowchart LR
+    A["English listing<br/>+ Etsy auto-translation"] --> B["SERV Reasoning<br/>find errors, write fix"]
+    P[("Germany playbook<br/>rules + source eval IDs")] --> B
+    B --> C["Reppo Evaluation API<br/>score Etsy version and fix"]
+    C --> D["Evaluator critiques<br/>from the Reppo trace"]
+    D --> E["SERV Reasoning<br/>distill new rules"]
+    E --> P
+    C --> R[("Round log<br/>both scores + eval IDs")]
 ```
-English listing + Etsy auto-translation
-              │
-              ▼
-   SERV Reasoning: find errors, write fix  ◄──── Germany playbook (rules + source eval IDs)
-              │                                              ▲
-              ▼                                              │
-   Reppo: score auto-translation and fix                     │
-              │                                              │
-              ▼                                              │
-   Evaluator critiques from Reppo trace                      │
-              │                                              │
-              ▼                                              │
-   SERV Reasoning: distill new rules ────────────────────────┘
-              │
-              ▼
-   Round log: both scores + both eval IDs
+
+### One check, end to end
+
+```mermaid
+sequenceDiagram
+    actor Seller
+    participant App as Lokvane /check
+    participant API as Lokvane API
+    participant SERV as SERV Reasoning
+    participant Reppo as Reppo Evaluation API
+    participant Store as Playbook and rounds
+
+    Seller->>App: Paste English listing and Etsy German version
+    App->>API: POST /api/fix
+    API->>Store: Load Germany playbook
+    API->>SERV: Original + translation + playbook rules (strict JSON schema)
+    SERV-->>API: Errors and corrected listing
+    API-->>App: Show errors and fix
+    par Score both versions
+        App->>API: POST /api/evaluate (Etsy version)
+        API->>Reppo: Submit evaluation
+    and
+        App->>API: POST /api/evaluate (Lokvane fix)
+        API->>Reppo: Submit evaluation
+    end
+    loop Until both are COMPLETED
+        App->>API: GET /api/evaluate/{id}
+        API->>Reppo: Read verdict
+    end
+    App->>API: POST /api/learn
+    API->>Reppo: Read both verdict traces
+    API->>SERV: Critiques + existing rules (strict JSON schema)
+    SERV-->>API: Up to 3 new rules with source eval IDs
+    API->>Store: Save rules and the round
+    API-->>App: New rules, updated playbook, round history
 ```
 
 ---
