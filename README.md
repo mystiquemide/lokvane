@@ -65,7 +65,7 @@ The hackathon judges three things: creativity, user readiness, and revenue poten
 - **One screen, one action.** Paste two texts and press one button. No account, no setup, no Etsy login.
 - **Results a seller can act on.** Each error is shown as wrong phrase → corrected phrase with a one-line explanation in English, followed by a ready-to-paste German title, description and 13 tags.
 - **Honest states.** The UI shows when the Reppo panel is reviewing (with elapsed time), failed evaluations, missing API keys, and a notice that Reppo evaluations are public.
-- **Safe to leave open to the public.** Every endpoint that spends SERV or Reppo credits is rate-limited per IP, listing fields are capped at 8,000 characters, eval IDs are validated, and a round can't be learned from twice. Each guard is covered by tests.
+- **Safe to leave open to the public.** Every endpoint that spends SERV or Reppo credits is limited to 3 checks per visitor per hour, with a daily budget across all visitors (60 fixes and 30 Reppo evaluations by default, set with `DAILY_FIX_LIMIT`, `DAILY_EVAL_LIMIT` and `DAILY_LEARN_LIMIT`). Visitors are identified by the IP the proxy reports, so a spoofed `X-Forwarded-For` header doesn't get around the limit. Listing fields are capped at 8,000 characters, eval IDs are validated, and a round can't be learned from twice. Each guard is covered by tests.
 
 ### Revenue potential
 
@@ -276,6 +276,9 @@ Sample IDs: `glassware`, `ring`, `candle`, `print`.
 | `SERV_API_KEY` | Yes | SERV Reasoning API key |
 | `REPPO_API_KEY` | Yes | Reppo Evaluation API key |
 | `SERV_MODEL` | No | SERV Reasoning model, defaults to `gpt-5.4-mini` |
+| `DAILY_FIX_LIMIT` | No | Fixes allowed per day across all visitors, defaults to 60 |
+| `DAILY_EVAL_LIMIT` | No | Reppo evaluations allowed per day across all visitors, defaults to 30 (15 checks) |
+| `DAILY_LEARN_LIMIT` | No | Learning steps allowed per day across all visitors, defaults to 30 |
 
 ### API
 
@@ -299,7 +302,7 @@ npm test
 npm run typecheck
 ```
 
-Unit tests in [tests/core.test.ts](tests/core.test.ts) cover critique extraction from the Reppo trace, the evaluation prompt, input limits, per-IP rate limiting and serialized playbook writes. [GitHub Actions](.github/workflows/ci.yml) runs the typecheck, the tests and a production build on every push to `main`.
+Unit tests in [tests/core.test.ts](tests/core.test.ts) cover critique extraction from the Reppo trace, the evaluation prompt, input limits, per-IP rate limiting, client IP detection, the daily budget and serialized playbook writes. [GitHub Actions](.github/workflows/ci.yml) runs the typecheck, the tests and a production build on every push to `main`.
 
 These guards were checked against a production build:
 
@@ -310,7 +313,9 @@ These guards were checked against a production build:
 | Malformed eval ID | `400 Invalid eval id` |
 | Same ID for both evaluations | `400` |
 | Learning from a round that was already logged | `409 This round was already learned from` |
-| 11th paid request from one IP within 10 minutes | `429 Too many requests` |
+| A 4th check from one visitor within an hour | `429 Too many requests` |
+| Any check after the daily budget is used up | `503 Daily check limit reached` |
+| A spoofed `X-Forwarded-For` header | Ignored. The limit follows the real client IP |
 
 ## Limitations
 

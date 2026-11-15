@@ -3,13 +3,13 @@ import { getEval, critiques } from "@/lib/reppo";
 import { servJSON, RULES_SCHEMA } from "@/lib/serv";
 import { getPlaybook, savePlaybook, getRounds, saveRounds, type Rule } from "@/lib/store";
 import { market } from "@/lib/markets";
-import { rateLimit, errorResponse, serialized, HttpError } from "@/lib/guard";
+import { rateLimit, dailyBudget, errorResponse, serialized, HttpError } from "@/lib/guard";
 
 const MAX_RULES = 12;
 
 export async function POST(req: Request) {
   try {
-    rateLimit(req, "learn", 10, 10 * 60_000);
+    rateLimit(req, "learn", 6, 60 * 60_000);
     const { marketKey, listingTitle, baselineEvalId, fixEvalId, rulesUsed } = await req.json();
     const m = market(marketKey);
     if (typeof baselineEvalId !== "string" || typeof fixEvalId !== "string" || baselineEvalId === fixEvalId) {
@@ -22,6 +22,7 @@ export async function POST(req: Request) {
     if ((await getRounds(marketKey)).some((r) => r.fixEvalId === fix.id || r.baselineEvalId === base.id)) {
       throw new HttpError(409, "This round was already learned from");
     }
+    dailyBudget("learn");
     const rules = await getPlaybook(marketKey);
     const notes = [
       ...critiques(base).map((c) => `[on machine translation, eval ${base.id}] ${c}`),

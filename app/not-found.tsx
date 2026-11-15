@@ -1,4 +1,4 @@
-import { Nav, Footer } from "@/components/Nav";
+import { Nav } from "@/components/Nav";
 import { PrimaryLink, SecondaryLink } from "@/components/Button";
 
 export default function NotFound() {
@@ -14,7 +14,6 @@ export default function NotFound() {
           <SecondaryLink href="/">Back to Lokvane</SecondaryLink>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

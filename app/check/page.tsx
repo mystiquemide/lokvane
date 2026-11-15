@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowRight, Check, Copy, Gavel, LoaderCircle, ScanSearch, BookOpen } from "lucide-react";
-import { Nav, Footer } from "@/components/Nav";
+import { Nav } from "@/components/Nav";
 import { SAMPLES } from "@/lib/samples";
 
 type Err = { machine: string; problem: string; fix: string };
@@ -16,7 +16,8 @@ type Phase = "idle" | "fixing" | "reviewing" | "learning" | "done";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 const FRIENDLY: [RegExp, string][] = [
-  [/Too many requests/i, "You've run a lot of checks in a short time. Give it a few minutes and try again."],
+  [/Too many requests/i, "You've reached the limit of 3 checks an hour. Try again a little later."],
+  [/Daily check limit/i, "Lokvane has reached today's check limit. Try again tomorrow."],
   [/longer than/i, "That listing is too long. Keep each field under 8,000 characters."],
   [/required/i, "Paste both the English listing and Etsy's German translation first."],
   [/FAILED|failed/i, "The Reppo panel couldn't finish this check. Run it again, it usually works the second time."],
@@ -244,7 +245,6 @@ export default function LokvaneApp() {
           </section>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

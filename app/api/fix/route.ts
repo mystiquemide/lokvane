@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { servJSON, SERV_MODEL, FIX_SCHEMA } from "@/lib/serv";
 import { getPlaybook } from "@/lib/store";
 import { market } from "@/lib/markets";
-import { text, rateLimit, errorResponse } from "@/lib/guard";
+import { text, rateLimit, dailyBudget, errorResponse } from "@/lib/guard";
 
 export type FixResult = {
   errors: { machine: string; problem: string; fix: string }[];
@@ -11,12 +11,13 @@ export type FixResult = {
 
 export async function POST(req: Request) {
   try {
-    rateLimit(req, "fix", 10, 10 * 60_000);
+    rateLimit(req, "fix", 5, 60 * 60_000);
     const body = await req.json();
     const original = text(body.original, "original");
     const machine = text(body.machine, "machine");
     const marketKey = body.marketKey;
     const m = market(marketKey);
+    dailyBudget("fix");
     const rules = await getPlaybook(marketKey);
     const system = `You are Lokvane, a marketplace localization specialist for ${m.name}. You review an Etsy machine translation into ${m.language} against the English original, list every error that would mislead or put off a buyer in ${m.name}, and write a corrected listing.
 Error types to catch: meaning changes (numbers, materials, sizes, era), false friends, wrong register or tone, unnatural phrasing, literal idioms, search terms local buyers would not use, missing local conventions (units, sizes, formats).

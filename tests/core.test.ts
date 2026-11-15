@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { critiques, evalInput, type ReppoEval } from "../lib/reppo.ts";
-import { text, rateLimit, serialized, HttpError } from "../lib/guard.ts";
+import { text, rateLimit, dailyBudget, clientIp, serialized, HttpError } from "../lib/guard.ts";
 
 const verdict = (over: Partial<ReppoEval> = {}): ReppoEval => ({
   id: "cmtest000000000000000001",
@@ -42,11 +42,23 @@ test("text: rejects empty and oversized listing fields", () => {
 });
 
 test("rateLimit: allows up to the limit per IP, then returns 429", () => {
-  const req = new Request("http://x", { headers: { "x-forwarded-for": "203.0.113.9" } });
+  const req = new Request("http://x", { headers: { "x-real-ip": "203.0.113.9" } });
   for (let i = 0; i < 3; i++) rateLimit(req, "t", 3, 60_000);
   assert.throws(() => rateLimit(req, "t", 3, 60_000), (e: HttpError) => e.status === 429);
-  const other = new Request("http://x", { headers: { "x-forwarded-for": "203.0.113.10" } });
+  const other = new Request("http://x", { headers: { "x-real-ip": "203.0.113.10" } });
   assert.doesNotThrow(() => rateLimit(other, "t", 3, 60_000));
+});
+
+test("clientIp: trusts X-Real-IP and the proxy-added last hop, not a spoofed first hop", () => {
+  assert.equal(clientIp(new Request("http://x", { headers: { "x-real-ip": "198.51.100.1", "x-forwarded-for": "1.2.3.4" } })), "198.51.100.1");
+  assert.equal(clientIp(new Request("http://x", { headers: { "x-forwarded-for": "1.2.3.4, 198.51.100.2" } })), "198.51.100.2");
+});
+
+test("dailyBudget: caps total calls across all visitors, then returns 503", () => {
+  process.env.DAILY_EVAL_LIMIT = "2";
+  dailyBudget("evaluate");
+  dailyBudget("evaluate");
+  assert.throws(() => dailyBudget("evaluate"), (e: HttpError) => e.status === 503);
 });
 
 test("serialized: concurrent writes run one at a time, and a failure doesn't block the queue", async () => {

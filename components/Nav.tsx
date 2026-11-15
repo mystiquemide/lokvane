@@ -54,14 +54,13 @@ const CREDITS = [
 const ext = { target: "_blank", rel: "noopener noreferrer" } as const;
 
 export function Footer() {
-  const onCheck = usePathname() === "/check";
   return (
     <footer className="border-t border-line">
       <div className="mx-auto max-w-[1200px] px-6 py-12">
         <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
           <Logo />
           <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
-            {!onCheck && <Link href="/check" className="transition-colors hover:text-text">Check a listing</Link>}
+            <Link href="/check" className="transition-colors hover:text-text">Check a listing</Link>
             <Link href="/#how" className="transition-colors hover:text-text">How it works</Link>
             <Link href="/#results" className="transition-colors hover:text-text">Results</Link>
             <a href={REPO_URL} {...ext} className="transition-colors hover:text-text">Source</a>
