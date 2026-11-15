@@ -330,15 +330,6 @@ These guards were checked against a production build:
 - **Some rules overlap.** The rule learner skips rules already in the playbook, but similar wording can still slip through. The playbook is capped at 12 rules, and the oldest drop off first.
 - **Example listings.** The four built-in listings were written for testing and are labeled as such in the UI. The errors in them are types sellers report, not copies of specific real listings.
 
-## Submission checklist
-
-- [x] Public code repository (this repo)
-- [x] Live demo link: https://lokvane.midelabs.xyz
-- [x] Demo video: https://youtu.be/Xb878du-ue8
-- [x] Write-up: what Lokvane does (The solution), how it uses SERV Reasoning (How SERV Reasoning is used), track entered (Tracks), what was built during the hackathon (About, What we built)
-- [ ] X post: _link added at submission_
-- [x] SERV Reasoning is part of the build
-
 ## Credits
 
 Photography from Unsplash by [Yasin Onus](https://unsplash.com/photos/hands-shaping-clay-on-a-pottery-wheel-MsKMSCxNWB0), [Guillaume de Germain](https://unsplash.com/photos/table-set-with-lemons-and-crystal-f6QoaTtdyGw), [Frames For Your Heart](https://unsplash.com/photos/person-holding-clear-glass-with-white-cream-Rj-XcS9Gl4g) and [Seiya Maeda](https://unsplash.com/photos/a-shelf-filled-with-lots-of-lit-candles-iujeijz9nwE).
