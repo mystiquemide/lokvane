@@ -10,7 +10,7 @@ export default function NotFound() {
         <h1 className="mt-4 text-4xl font-semibold tracking-[-0.03em]">This page doesn&apos;t exist</h1>
         <p className="mt-3 max-w-md text-muted">The link may be old or mistyped. Start from one of these instead.</p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <PrimaryLink href="/app">Check a listing</PrimaryLink>
+          <PrimaryLink href="/check">Check a listing</PrimaryLink>
           <SecondaryLink href="/">Back to Lokvane</SecondaryLink>
         </div>
       </main>

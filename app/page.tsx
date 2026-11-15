@@ -62,7 +62,7 @@ export default function Landing() {
               </Reveal>
               <Reveal delay={0.15}>
                 <div className="mt-9 flex flex-wrap justify-center gap-3">
-                  <PrimaryLink href="/app">Check a listing</PrimaryLink>
+                  <PrimaryLink href="/check">Check a listing</PrimaryLink>
                   <SecondaryLink href="/#results">See the results</SecondaryLink>
                 </div>
               </Reveal>
@@ -281,7 +281,7 @@ export default function Landing() {
               <div className="relative flex flex-col items-start gap-6 px-8 py-20 sm:px-14 sm:py-24">
                 <h2 className="max-w-xl text-3xl font-semibold leading-tight tracking-[-0.03em] sm:text-[44px]">Check what your German buyers see</h2>
                 <p className="max-w-md text-text/75">No account. Paste a listing and Etsy&apos;s translation, and get the fix in seconds.</p>
-                <PrimaryLink href="/app">Check a listing</PrimaryLink>
+                <PrimaryLink href="/check">Check a listing</PrimaryLink>
               </div>
             </div>
           </Reveal>

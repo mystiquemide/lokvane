@@ -2,7 +2,7 @@
 
 Lokvane finds what Etsy's auto-translation got wrong in each market, fixes the listing, and learns that market's rules from independent Reppo verdicts. Each listing comes out better than the one before it.
 
-**Live app:** https://lokvane.midelabs.xyz (product page) · https://lokvane.midelabs.xyz/app (the tool)
+**Live app:** https://lokvane.midelabs.xyz (product page) · https://lokvane.midelabs.xyz/check (the tool)
 **Demo video:** _link added at submission_
 **X post:** _link added at submission_
 **Track:** Reppo (SERV Hackathon Edition 02 by OpenServ)
@@ -172,7 +172,7 @@ The product page at `/` opens with the problem and shows a real recorded run in 
 
 ![Lokvane: errors found in Etsy's German auto-translation, with fixes and the corrected listing](docs/screens/01-errors-and-fix.png)
 
-The tool at `/app`. Left: the English original and Etsy's German auto-translation as pasted by the seller (example listing). Right: every error SERV Reasoning found. The machine's phrase is struck through in red, the correction is in green, and below each one is a plain-English explanation of why it would mislead or put off a German buyer. Below the errors is the full corrected listing, ready to paste into Etsy: German title, description and 13 local search tags. The footer line shows how many playbook rules were applied and which SERV Reasoning model was used.
+The tool at `/check`. Left: the English original and Etsy's German auto-translation as pasted by the seller (example listing). Right: every error SERV Reasoning found. The machine's phrase is struck through in red, the correction is in green, and below each one is a plain-English explanation of why it would mislead or put off a German buyer. Below the errors is the full corrected listing, ready to paste into Etsy: German title, description and 13 local search tags. The footer line shows how many playbook rules were applied and which SERV Reasoning model was used.
 
 ### 2. Reppo panel reviewing
 
@@ -197,7 +197,7 @@ Left: the Germany playbook. Each rule came from a Reppo evaluator critique and s
 ## Judge path (5 minutes)
 
 1. **Open the product page:** https://lokvane.midelabs.xyz. The hero shows a real recorded run, and the results chart plots all seven rounds.
-2. **Open the tool:** https://lokvane.midelabs.xyz/app. The playbook and round history from the proof run load right away.
+2. **Open the tool:** https://lokvane.midelabs.xyz/check. The playbook and round history from the proof run load right away.
 3. **Check the proof:** look at the round history (bottom right). Fix scores rise as more rules are in use. The same glassware listing goes from 80 to 100, and the same ring listing from 76 to 94. Every bar has a Reppo eval ID.
 4. **Trace one rule:** pick a playbook rule (bottom left), note its Reppo eval ID, and find that ID in [proof/rounds-de.json](proof/rounds-de.json). It's the round whose critique produced the rule.
 5. **Run it yourself:** pick an example listing from the dropdown, or paste your own English listing and a German translation, then press **Check and fix for Germany**. The errors appear in a few seconds. The Reppo verdicts take 1 to 7 minutes, then new rules appear, highlighted.
@@ -216,7 +216,7 @@ Left: the Germany playbook. Each rule came from a Reppo evaluator critique and s
 | Learn API | `app/api/learn/route.ts` | Turns Reppo critiques into rules with source eval IDs and logs the round |
 | State API and store | `app/api/state/route.ts`, `lib/store.ts` | Playbook and round history per market, seeded from the proof run |
 | Product page | `app/page.tsx`, `components/` | Landing page built from the proof data: recorded run in the hero, results chart, sponsor stack, branded 404 |
-| Tool | `app/app/page.tsx` | Input, progress rail, error diff, corrected listing with copy, score cards, playbook, round history |
+| Tool | `app/check/page.tsx` | Input, progress rail, error diff, corrected listing with copy, score cards, playbook, round history |
 | Markets | `lib/markets.ts` | Market config (Germany live, France and Japan defined) |
 | Example listings | `lib/samples.json` | Four example Etsy-style listings with machine translations containing error types sellers report. These are written for testing and are not real shops |
 | Request guards | `lib/guard.ts` | Per-IP rate limits, input size limits, error codes, and serialized writes to the playbook |

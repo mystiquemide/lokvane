@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowRight, Check, Copy, Gavel, LoaderCircle, ScanSearch, BookOpen } from "lucide-react";
-import { Nav } from "@/components/Nav";
+import { Nav, Footer } from "@/components/Nav";
 import { SAMPLES } from "@/lib/samples";
 
 type Err = { machine: string; problem: string; fix: string };
@@ -244,6 +244,7 @@ export default function LokvaneApp() {
           </section>
         </div>
       </main>
+      <Footer />
     </>
   );
 }
