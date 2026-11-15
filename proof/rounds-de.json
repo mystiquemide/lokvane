@@ -1,0 +1,76 @@
+[
+  {
+    "round": 1,
+    "listingTitle": "Vintage 19-Piece Crystal Glassware Set | Perfect Gift for Her | Mid-Century Barware, 1960s",
+    "baselineEvalId": "cmwi4mrur000207l2oatnwmyg",
+    "fixEvalId": "cmwi4mrfv000207jvgyrsvixb",
+    "baselineScore": 76,
+    "fixScore": 80,
+    "rulesUsed": 0,
+    "rulesAdded": [
+      "Flag mistranslations that change the meaning into an unrelated or harmful German term, especially when the error would mislead buyers.",
+      "Check German Etsy listings for leftover English SEO tags and localize them unless the English term is clearly appropriate for the target market.",
+      "Do not penalize a legitimate German product term merely because it differs from a literal English translation when it is natural in e-commerce usage."
+    ],
+    "at": "2026-11-15T17:52:07.329Z"
+  },
+  {
+    "round": 2,
+    "listingTitle": "Dainty Sterling Silver Stacking Ring | Size 7 | Minimalist Everyday Jewelry",
+    "baselineEvalId": "cmwi4vhgk000d07jvpen7an6s",
+    "fixEvalId": "cmwi4vhib000e07jv705wmwaq",
+    "baselineScore": 74,
+    "fixScore": 76,
+    "rulesUsed": 3,
+    "rulesAdded": [
+      "Flag untranslated or poorly localized search terms in German Etsy listings when they reduce native-sounding discoverability for German buyers.",
+      "Check size or measurement values against German market conventions and convert them when a U.S. format would confuse buyers."
+    ],
+    "at": "2026-11-15T18:00:12.585Z"
+  },
+  {
+    "round": 3,
+    "listingTitle": "Hand-Poured Soy Candle, 8 oz | Smells Like Christmas Morning | Cozy Holiday Decor",
+    "baselineEvalId": "cmwi5kh1x000q07jvqvj3dfuu",
+    "fixEvalId": "cmwi5kh1p000p07jv2irrjgd0",
+    "baselineScore": 77,
+    "fixScore": 95,
+    "rulesUsed": 5,
+    "rulesAdded": [
+      "Flag mixed-language product phrases that sound unnatural in German, even if the underlying translation is broadly correct.",
+      "Do not lower factual accuracy for added Etsy tag text when the core translated product information remains correct and complete.",
+      "Treat failure to convert imperial measurements into metric units as a localization error that can materially hurt German buyer comprehension and search relevance."
+    ],
+    "at": "2026-11-15T18:15:59.465Z"
+  },
+  {
+    "round": 4,
+    "listingTitle": "Botanical Wall Art Print | 8x10 inch | Unframed | Instant Mood Booster for Your Home Office",
+    "baselineEvalId": "cmwi5ochi000107l5vols0yb3",
+    "fixEvalId": "cmwi5ocgp000007l5c8nksrp9",
+    "baselineScore": 73,
+    "fixScore": 92,
+    "rulesUsed": 8,
+    "rulesAdded": [
+      "Flag unnatural German phrasings even when the translation is otherwise accurate, and lower the score if they would sound awkward to native buyers.",
+      "Treat missing metric conversions as a localization error when German buyers would expect centimeter-based measurements instead of U.S. units.",
+      "Penalize leftover English or mixed-language search terms in German Etsy listings when they are not clearly appropriate for local e-commerce use."
+    ],
+    "at": "2026-11-15T18:17:30.291Z"
+  },
+  {
+    "round": 5,
+    "listingTitle": "Vintage 19-Piece Crystal Glassware Set | Perfect Gift for Her | Mid-Century Barware, 1960s",
+    "baselineEvalId": "cmwi5qb4z000008kxpz3yh7zg",
+    "fixEvalId": "cmwi5qaql000207l5em65kv5t",
+    "baselineScore": 45,
+    "fixScore": 100,
+    "rulesUsed": 11,
+    "rulesAdded": [
+      "Penalize catastrophic mistranslations that turn a source term into a dangerous or unrelated German meaning, especially when the error would mislead buyers.",
+      "Lower factual accuracy when a translation misses a critical compound or numeral meaning and turns it into the wrong quantity or concept in German.",
+      "Flag unnatural German phrasing even when the core translation is correct, if the wording would sound awkward to native German e-commerce buyers."
+    ],
+    "at": "2026-11-15T18:19:24.756Z"
+  }
+]

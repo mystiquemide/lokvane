@@ -16,12 +16,16 @@ export type Round = {
   at: string;
 };
 
+const SEED = path.join(process.cwd(), "proof");
+
+// Reads live data first, then the committed proof run from Nov 15 2026 as a starting point.
 async function read<T>(file: string, fallback: T): Promise<T> {
-  try {
-    return JSON.parse(await fs.readFile(path.join(DIR, file), "utf8")) as T;
-  } catch {
-    return fallback;
+  for (const dir of [DIR, SEED]) {
+    try {
+      return JSON.parse(await fs.readFile(path.join(dir, file), "utf8")) as T;
+    } catch {}
   }
+  return fallback;
 }
 async function write(file: string, data: unknown) {
   await fs.mkdir(DIR, { recursive: true });

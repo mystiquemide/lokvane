@@ -1,0 +1,74 @@
+[
+  {
+    "id": "628a516f",
+    "text": "Do not penalize a legitimate German product term merely because it differs from a literal English translation when it is natural in e-commerce usage.",
+    "sourceEvalId": "cmwi4mrfv000207jvgyrsvixb",
+    "createdAt": "2026-11-15T17:52:07.326Z"
+  },
+  {
+    "id": "1952bc45",
+    "text": "Flag untranslated or poorly localized search terms in German Etsy listings when they reduce native-sounding discoverability for German buyers.",
+    "sourceEvalId": "cmwi4vhgk000d07jvpen7an6s",
+    "createdAt": "2026-11-15T18:00:12.582Z"
+  },
+  {
+    "id": "fa3afb0f",
+    "text": "Check size or measurement values against German market conventions and convert them when a U.S. format would confuse buyers.",
+    "sourceEvalId": "cmwi4vhib000e07jv705wmwaq",
+    "createdAt": "2026-11-15T18:00:12.582Z"
+  },
+  {
+    "id": "278f319f",
+    "text": "Flag mixed-language product phrases that sound unnatural in German, even if the underlying translation is broadly correct.",
+    "sourceEvalId": "cmwi5kh1p000p07jv2irrjgd0",
+    "createdAt": "2026-11-15T18:15:59.461Z"
+  },
+  {
+    "id": "32d28205",
+    "text": "Do not lower factual accuracy for added Etsy tag text when the core translated product information remains correct and complete.",
+    "sourceEvalId": "cmwi5kh1p000p07jv2irrjgd0",
+    "createdAt": "2026-11-15T18:15:59.461Z"
+  },
+  {
+    "id": "f3d3170d",
+    "text": "Treat failure to convert imperial measurements into metric units as a localization error that can materially hurt German buyer comprehension and search relevance.",
+    "sourceEvalId": "cmwi5kh1x000q07jvqvj3dfuu",
+    "createdAt": "2026-11-15T18:15:59.461Z"
+  },
+  {
+    "id": "185ac209",
+    "text": "Flag unnatural German phrasings even when the translation is otherwise accurate, and lower the score if they would sound awkward to native buyers.",
+    "sourceEvalId": "cmwi5ochi000107l5vols0yb3",
+    "createdAt": "2026-11-15T18:17:30.289Z"
+  },
+  {
+    "id": "e901213d",
+    "text": "Treat missing metric conversions as a localization error when German buyers would expect centimeter-based measurements instead of U.S. units.",
+    "sourceEvalId": "cmwi5ochi000107l5vols0yb3",
+    "createdAt": "2026-11-15T18:17:30.289Z"
+  },
+  {
+    "id": "8241978b",
+    "text": "Penalize leftover English or mixed-language search terms in German Etsy listings when they are not clearly appropriate for local e-commerce use.",
+    "sourceEvalId": "cmwi5ocgp000007l5c8nksrp9",
+    "createdAt": "2026-11-15T18:17:30.289Z"
+  },
+  {
+    "id": "da5b4270",
+    "text": "Penalize catastrophic mistranslations that turn a source term into a dangerous or unrelated German meaning, especially when the error would mislead buyers.",
+    "sourceEvalId": "cmwi5qb4z000008kxpz3yh7zg",
+    "createdAt": "2026-11-15T18:19:24.754Z"
+  },
+  {
+    "id": "2e2b3ce3",
+    "text": "Lower factual accuracy when a translation misses a critical compound or numeral meaning and turns it into the wrong quantity or concept in German.",
+    "sourceEvalId": "cmwi5qb4z000008kxpz3yh7zg",
+    "createdAt": "2026-11-15T18:19:24.754Z"
+  },
+  {
+    "id": "408fadfe",
+    "text": "Flag unnatural German phrasing even when the core translation is correct, if the wording would sound awkward to native German e-commerce buyers.",
+    "sourceEvalId": "cmwi5qb4z000008kxpz3yh7zg",
+    "createdAt": "2026-11-15T18:19:24.754Z"
+  }
+]
