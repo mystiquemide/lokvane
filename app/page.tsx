@@ -45,23 +45,23 @@ export default function Landing() {
           <div className="relative h-[780px] overflow-hidden sm:h-[800px]">
             <Image src={hero} alt="Hands shaping clay on a pottery wheel" fill priority placeholder="blur" sizes="100vw" className="object-cover object-[60%_45%]" />
             <div className="absolute inset-0 bg-black/60" />
-            <div className="relative mx-auto flex h-full max-w-[1200px] flex-col justify-center px-6 pb-24 pt-16 sm:pb-36">
+            <div className="relative mx-auto flex h-full max-w-[1200px] flex-col items-center justify-center px-6 pb-24 pt-16 text-center sm:pb-36">
               <Reveal>
                 <p className="font-mono text-sm text-text/70">For Etsy sellers shipping to Germany</p>
               </Reveal>
               <Reveal delay={0.05}>
-                <h1 className="mt-5 max-w-3xl text-[40px] font-semibold leading-[1.05] tracking-[-0.035em] sm:text-[64px]">
+                <h1 className="mx-auto mt-5 max-w-3xl text-[40px] font-semibold leading-[1.05] tracking-[-0.035em] sm:text-[64px]">
                   Etsy translated your listing. Here&apos;s what German buyers read.
                 </h1>
               </Reveal>
               <Reveal delay={0.1}>
-                <p className="mt-6 max-w-xl text-[17px] leading-relaxed text-text/80">
+                <p className="mx-auto mt-6 max-w-xl text-[17px] leading-relaxed text-text/80">
                   Lokvane finds the mistakes in Etsy&apos;s auto-translation, fixes the listing, and learns the German market from independent
                   evaluator verdicts.
                 </p>
               </Reveal>
               <Reveal delay={0.15}>
-                <div className="mt-9 flex flex-wrap gap-3">
+                <div className="mt-9 flex flex-wrap justify-center gap-3">
                   <PrimaryLink href="/app">Check a listing</PrimaryLink>
                   <SecondaryLink href="/#results">See the results</SecondaryLink>
                 </div>
