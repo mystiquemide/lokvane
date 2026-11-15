@@ -233,7 +233,7 @@ Left: the Germany playbook. Each rule came from a Reppo evaluator critique and s
 - **TypeScript 5**
 - **Tailwind CSS 4**, Inter and JetBrains Mono
 - **Motion** for reveals and score animations, **Lucide** icons
-- Photography from **Unsplash** (Yasin Onus, Guillaume de Germain, Frames For Your Heart, Seiya Maeda), credited in the footer
+- Photography from **Unsplash** (see Credits)
 - **OpenAI Node SDK**, pointed at SERV Reasoning
 - **Docker** (Node 22) and **Dokploy** for deployment, with Let's Encrypt HTTPS
 
@@ -332,6 +332,10 @@ These guards were checked against a production build:
 - [x] Write-up: what Lokvane does (The solution), how it uses SERV Reasoning (How SERV Reasoning is used), track entered (Tracks), what was built during the hackathon (About, What we built)
 - [ ] X post: _link added at submission_
 - [x] SERV Reasoning is part of the build
+
+## Credits
+
+Photography from Unsplash by [Yasin Onus](https://unsplash.com/photos/hands-shaping-clay-on-a-pottery-wheel-MsKMSCxNWB0), [Guillaume de Germain](https://unsplash.com/photos/table-set-with-lemons-and-crystal-f6QoaTtdyGw), [Frames For Your Heart](https://unsplash.com/photos/person-holding-clear-glass-with-white-cream-Rj-XcS9Gl4g) and [Seiya Maeda](https://unsplash.com/photos/a-shelf-filled-with-lots-of-lit-candles-iujeijz9nwE).
 
 ## License
 
