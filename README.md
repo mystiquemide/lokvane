@@ -4,7 +4,7 @@ Lokvane finds what Etsy's auto-translation got wrong in each market, fixes the l
 
 **Live app:** https://lokvane.midelabs.xyz (product page) · https://lokvane.midelabs.xyz/check (the tool)
 **Demo video:** https://youtu.be/Xb878du-ue8
-**X post:** _link added at submission_
+**X post:** https://x.com/MystiqueMide/status/2122079507251085492
 **Track:** Reppo (SERV Hackathon Edition 02 by OpenServ)
 
 ---
