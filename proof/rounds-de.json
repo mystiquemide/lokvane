@@ -87,5 +87,20 @@
       "Penalty severe mistranslations that turn a source term into an unrelated or dangerous German meaning, especially when the error misleads buyers about the product."
     ],
     "at": "2026-11-15T18:41:30.184Z"
+  },
+  {
+    "round": 7,
+    "listingTitle": "Hand-Poured Soy Candle, 8 oz | Smells Like Christmas Morning | Cozy Holiday Decor",
+    "baselineEvalId": "cmwi817a8000108l22hb637sz",
+    "fixEvalId": "cmwi817ay000208l2q3gyhfx0",
+    "baselineScore": 63,
+    "fixScore": 93,
+    "rulesUsed": 12,
+    "rulesAdded": [
+      "Lower instruction adherence when a German Etsy listing repeats the title or other listing text without adding new localized content.",
+      "Treat culturally awkward but understandable literal terms as localization issues when they would feel unnatural to German Etsy buyers, even if they are not strictly incorrect.",
+      "Do not give a perfect factual accuracy score when a German Etsy translation preserves most meaning but still misses important localization nuances such as expected local terminology."
+    ],
+    "at": "2026-11-15T19:23:47.127Z"
   }
 ]

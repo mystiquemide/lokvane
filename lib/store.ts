@@ -22,14 +22,14 @@ const SEED = path.join(process.cwd(), "proof");
 async function read<T>(file: string, fallback: T): Promise<T> {
   for (const dir of [DIR, SEED]) {
     try {
-      return JSON.parse(await fs.readFile(path.join(dir, file), "utf8")) as T;
+      return JSON.parse(await fs.readFile(/*turbopackIgnore: true*/ path.join(dir, file), "utf8")) as T;
     } catch {}
   }
   return fallback;
 }
 async function write(file: string, data: unknown) {
   await fs.mkdir(DIR, { recursive: true });
-  await fs.writeFile(path.join(DIR, file), JSON.stringify(data, null, 2));
+  await fs.writeFile(/*turbopackIgnore: true*/ path.join(DIR, file), JSON.stringify(data, null, 2));
 }
 
 export const getPlaybook = (market: string) => read<Rule[]>(`playbook-${market}.json`, []);

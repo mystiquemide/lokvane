@@ -1,23 +1,5 @@
 [
   {
-    "id": "278f319f",
-    "text": "Flag mixed-language product phrases that sound unnatural in German, even if the underlying translation is broadly correct.",
-    "sourceEvalId": "cmwi5kh1p000p07jv2irrjgd0",
-    "createdAt": "2026-11-15T18:15:59.461Z"
-  },
-  {
-    "id": "32d28205",
-    "text": "Do not lower factual accuracy for added Etsy tag text when the core translated product information remains correct and complete.",
-    "sourceEvalId": "cmwi5kh1p000p07jv2irrjgd0",
-    "createdAt": "2026-11-15T18:15:59.461Z"
-  },
-  {
-    "id": "f3d3170d",
-    "text": "Treat failure to convert imperial measurements into metric units as a localization error that can materially hurt German buyer comprehension and search relevance.",
-    "sourceEvalId": "cmwi5kh1x000q07jvqvj3dfuu",
-    "createdAt": "2026-11-15T18:15:59.461Z"
-  },
-  {
     "id": "185ac209",
     "text": "Flag unnatural German phrasings even when the translation is otherwise accurate, and lower the score if they would sound awkward to native buyers.",
     "sourceEvalId": "cmwi5ochi000107l5vols0yb3",
@@ -70,5 +52,23 @@
     "text": "Penalty severe mistranslations that turn a source term into an unrelated or dangerous German meaning, especially when the error misleads buyers about the product.",
     "sourceEvalId": "cmwi6gwvd000408kx9q5vi3mi",
     "createdAt": "2026-11-15T18:41:30.184Z"
+  },
+  {
+    "id": "d9110a47",
+    "text": "Lower instruction adherence when a German Etsy listing repeats the title or other listing text without adding new localized content.",
+    "sourceEvalId": "cmwi817ay000208l2q3gyhfx0",
+    "createdAt": "2026-11-15T19:23:47.125Z"
+  },
+  {
+    "id": "d9b5de88",
+    "text": "Treat culturally awkward but understandable literal terms as localization issues when they would feel unnatural to German Etsy buyers, even if they are not strictly incorrect.",
+    "sourceEvalId": "cmwi817ay000208l2q3gyhfx0",
+    "createdAt": "2026-11-15T19:23:47.125Z"
+  },
+  {
+    "id": "9c4409b7",
+    "text": "Do not give a perfect factual accuracy score when a German Etsy translation preserves most meaning but still misses important localization nuances such as expected local terminology.",
+    "sourceEvalId": "cmwi817ay000208l2q3gyhfx0",
+    "createdAt": "2026-11-15T19:23:47.125Z"
   }
 ]

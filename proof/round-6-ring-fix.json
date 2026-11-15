@@ -1,0 +1,48 @@
+{
+  "note": "SERV Reasoning output from production round 6, transcribed from the capture in docs/screens/01-errors-and-fix.png. Wrong phrases, fixes, title and description are verbatim. Problem explanations are abridged. Scores and eval IDs match proof/rounds-de.json round 6.",
+  "round": 6,
+  "rulesUsed": 12,
+  "model": "gpt-5.4-mini",
+  "original": "Dainty Sterling Silver Stacking Ring | Size 7 | Minimalist Everyday Jewelry\nHandmade from recycled 925 sterling silver, 1.5mm band. Tarnish-resistant finish. Comes in a gift box, ready to give.",
+  "machine": "Zierlicher Sterling Silber Stapel Ring | Größe 7 | Minimalistischer Alltag Schmuck\nHandgemacht aus recyceltem 925 Sterling Silber, 1,5mm Band. Anlaufbeständiges Finish. Kommt in einer Gift Box, bereit zu geben.",
+  "errors": [
+    {
+      "machine": "Sterling Silber Stapel Ring",
+      "fix": "Sterlingsilber-Stapelring",
+      "problem": "Understandable but not natural German. Germans search for “Stapelring” as one word, and “Sterlingsilber” is the standard material term."
+    },
+    {
+      "machine": "Größe 7",
+      "fix": "Ringgröße 7 (US) bzw. deutsche Ringgröße entsprechend angeben",
+      "problem": "Ring size is in the US system, which is not the convention for German buyers. It should be marked as a US size or converted."
+    },
+    {
+      "machine": "Minimalistischer Alltag Schmuck",
+      "fix": "Minimalistischer Alltagsschmuck",
+      "problem": "Literal wording sounds awkward. German buyers expect the compound “Alltagsschmuck”."
+    },
+    {
+      "machine": "1,5mm Band",
+      "fix": "1,5 mm Ringband",
+      "problem": "German puts a space before the unit, and “Ringband” is clearer for jewelry listings."
+    },
+    {
+      "machine": "Anlaufbeständiges Finish",
+      "fix": "Anlaufgeschützte Oberfläche",
+      "problem": "A literal translation that sounds technical. “Anlaufgeschützte Oberfläche” is the buyer-friendly phrase."
+    },
+    {
+      "machine": "Kommt in einer Gift Box, bereit zu geben.",
+      "fix": "Kommt in einer Geschenkbox und ist direkt zum Verschenken bereit.",
+      "problem": "“Gift Box” was left in English, and in German “Gift” means poison. The phrase is also an awkward literal translation."
+    }
+  ],
+  "fixed": {
+    "title": "Zierlicher Sterlingsilber-Stapelring | Ringgröße 7 (US) | Minimalistischer Alltagsschmuck",
+    "description": "Handgemachter, zierlicher Stapelring aus recyceltem 925er Sterlingsilber mit 1,5 mm Ringband. Die anlaufgeschützte Oberfläche sorgt für langanhaltenden Glanz. Der Ring wird in einer Geschenkbox geliefert und ist direkt zum Verschenken bereit."
+  },
+  "baselineScore": 40,
+  "fixScore": 94,
+  "baselineEvalId": "cmwi6gwvd000408kx9q5vi3mi",
+  "fixEvalId": "cmwi6gwuv000308kx3n7wn825"
+}

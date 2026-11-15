@@ -1,254 +1,293 @@
-"use client";
+import Image from "next/image";
+import { ArrowUpRight, BookOpen, Gavel, Repeat, ScanSearch } from "lucide-react";
+import { Nav, Footer, REPO_URL } from "@/components/Nav";
+import { PrimaryLink, SecondaryLink } from "@/components/Button";
+import { Reveal } from "@/components/Reveal";
+import { RoundsChart } from "@/components/RoundsChart";
+import rounds from "@/proof/rounds-de.json";
+import playbook from "@/proof/playbook-de.json";
+import run from "@/proof/round-6-ring-fix.json";
+import hero from "@/public/images/hero-pottery.jpg";
+import glassware from "@/public/images/glassware.jpg";
+import candles from "@/public/images/candles-hand.jpg";
+import shelf from "@/public/images/candle-shelf.jpg";
 
-import { useEffect, useState } from "react";
-import { SAMPLES } from "@/lib/samples";
+const STEPS = [
+  { icon: ScanSearch, title: "Find every error.", body: "SERV Reasoning reads the English listing and Etsy's German version, and names each phrase that would mislead or put off a German buyer." },
+  { icon: Gavel, title: "Get an independent verdict.", body: "A Reppo evaluator panel scores Etsy's version and the Lokvane fix side by side. Lokvane never grades its own work." },
+  { icon: BookOpen, title: "Learn the market.", body: "The panel's critiques become rules in the Germany playbook. Each rule keeps the Reppo eval ID that taught it." },
+  { icon: Repeat, title: "Fix the next one better.", body: "Every new listing is fixed with the full playbook, so one listing's lessons improve the next." },
+];
 
-type Err = { machine: string; problem: string; fix: string };
-type Fix = { errors: Err[]; fixed: { title: string; description: string; tags: string[] }; rulesUsed: number; model: string };
-type Verdict = {
-  evalId: string;
-  status: string;
-  score: number | null;
-  route: string | null;
-  decision: string | null;
-  confidence: string | null;
-  reason: string | null;
-};
-type Rule = { id: string; text: string; sourceEvalId: string; createdAt: string };
-type Round = { round: number; listingTitle: string; baselineEvalId: string; fixEvalId: string; baselineScore: number | null; fixScore: number | null; rulesUsed: number; rulesAdded: string[] };
+const EXAMPLES = [
+  { en: "19-piece set", de: "Set aus dem 19. Jahrhundert", reads: "a set from the 19th century" },
+  { en: "Gift for her", de: "Gift für sie", reads: "poison for her" },
+  { en: "no chips", de: "keine Chips", reads: "no potato chips" },
+];
 
-const post = async <T,>(path: string, body: unknown): Promise<T> => {
-  const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  const j = await r.json();
-  if (!r.ok) throw new Error(j.error ?? `Request failed: ${r.status}`);
-  return j;
-};
-
-async function pollVerdict(evalId: string, onTick: (v: Verdict) => void): Promise<Verdict> {
-  for (let i = 0; i < 120; i++) {
-    const v: Verdict = await fetch(`/api/evaluate/${evalId}`).then((r) => r.json());
-    onTick(v);
-    if (v.status === "COMPLETED" || v.status === "FAILED") return v;
-    await new Promise((r) => setTimeout(r, 4000));
-  }
-  throw new Error("Reppo evaluation timed out");
-}
-
-function shortId(id: string) {
-  return id.length > 12 ? `${id.slice(0, 6)}…${id.slice(-5)}` : id;
-}
-
-export default function Page() {
-  const [sampleId, setSampleId] = useState<string>(SAMPLES[0].id);
-  const [original, setOriginal] = useState<string>(SAMPLES[0].original);
-  const [machine, setMachine] = useState<string>(SAMPLES[0].machine);
-  const [fix, setFix] = useState<Fix | null>(null);
-  const [baseline, setBaseline] = useState<Verdict | null>(null);
-  const [lokvane, setLokvane] = useState<Verdict | null>(null);
-  const [added, setAdded] = useState<Rule[]>([]);
-  const [playbook, setPlaybook] = useState<Rule[]>([]);
-  const [rounds, setRounds] = useState<Round[]>([]);
-  const [phase, setPhase] = useState<"idle" | "fixing" | "reviewing" | "learning" | "done">("idle");
-  const [error, setError] = useState<string | null>(null);
-  const [elapsed, setElapsed] = useState(0);
-
-  useEffect(() => {
-    fetch("/api/state?market=de").then((r) => r.json()).then((s) => { setPlaybook(s.playbook ?? []); setRounds(s.rounds ?? []); });
-  }, []);
-
-  useEffect(() => {
-    if (phase !== "reviewing") return;
-    const start = Date.now();
-    const t = setInterval(() => setElapsed(Math.round((Date.now() - start) / 1000)), 1000);
-    return () => clearInterval(t);
-  }, [phase]);
-
-  function pickSample(id: string) {
-    const s = SAMPLES.find((x) => x.id === id);
-    if (!s) return;
-    setSampleId(id);
-    setOriginal(s.original);
-    setMachine(s.machine);
-    setFix(null); setBaseline(null); setLokvane(null); setAdded([]); setPhase("idle"); setError(null);
-  }
-
-  async function run() {
-    setError(null); setFix(null); setBaseline(null); setLokvane(null); setAdded([]);
-    try {
-      setPhase("fixing");
-      const f = await post<Fix>("/api/fix", { original, machine, marketKey: "de" });
-      setFix(f);
-      setPhase("reviewing");
-      const candidate = `${f.fixed.title}\n${f.fixed.description}\nTags: ${f.fixed.tags.join(", ")}`;
-      const [b, l] = await Promise.all([
-        post<{ evalId: string }>("/api/evaluate", { original, candidate: machine, marketKey: "de" }),
-        post<{ evalId: string }>("/api/evaluate", { original, candidate, marketKey: "de" }),
-      ]);
-      const [bv, lv] = await Promise.all([pollVerdict(b.evalId, setBaseline), pollVerdict(l.evalId, setLokvane)]);
-      if (bv.status !== "COMPLETED" || lv.status !== "COMPLETED") throw new Error("A Reppo evaluation failed. Failed evaluations are not charged, so run it again.");
-      setPhase("learning");
-      const res = await post<{ added: Rule[]; playbook: Rule[]; rounds: Round[] }>("/api/learn", {
-        marketKey: "de", listingTitle: original.split("\n")[0], baselineEvalId: bv.evalId, fixEvalId: lv.evalId, rulesUsed: f.rulesUsed,
-      });
-      setAdded(res.added); setPlaybook(res.playbook); setRounds(res.rounds);
-      setPhase("done");
-    } catch (e) {
-      setError((e as Error).message);
-      setPhase("idle");
-    }
-  }
-
-  const busy = phase === "fixing" || phase === "reviewing" || phase === "learning";
-  const addedIds = new Set(added.map((r) => r.id));
-
+function SectionHead({ strong, rest, id }: { strong: string; rest: string; id?: string }) {
   return (
-    <main className="min-h-screen bg-[#f6f3ee] text-[#1d1b18]">
-      <div className="mx-auto max-w-6xl px-6 py-10">
-        <header className="flex items-end justify-between gap-6 border-b border-[#1d1b18]/15 pb-6">
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight">Lokvane</h1>
-            <p className="mt-1 text-sm text-[#1d1b18]/70">
-              Finds what Etsy auto-translation got wrong, fixes it, and learns each market from independent Reppo verdicts.
-            </p>
-          </div>
-          <Stamp market="DE" label="Germany" accepted={lokvane?.decision === "accept"} />
-        </header>
+    <h2 id={id} className="max-w-3xl scroll-mt-28 text-[22px] font-medium leading-snug tracking-[-0.01em] sm:text-[26px]">
+      <span className="text-text">{strong}</span> <span className="text-faint">{rest}</span>
+    </h2>
+  );
+}
 
-        <section className="mt-8 grid gap-6 md:grid-cols-2">
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 text-sm">
-              <label htmlFor="sample" className="text-[#1d1b18]/70">Sample listing</label>
-              <select id="sample" value={sampleId} onChange={(e) => pickSample(e.target.value)} className="rounded border border-[#1d1b18]/20 bg-white px-2 py-1">
-                {SAMPLES.map((s) => <option key={s.id} value={s.id}>{s.original.split("|")[0].trim()}</option>)}
-              </select>
+export default function Landing() {
+  const r1 = rounds[0], r2 = rounds[1], r5 = rounds[4], r6 = rounds[5];
+  const sampleRule = playbook.find((r) => r.sourceEvalId === "cmwi5qb4z000008kxpz3yh7zg") ?? playbook[0];
+  return (
+    <>
+      <Nav />
+      <main>
+        {/* Hero */}
+        <section className="relative -mt-[72px]">
+          <div className="relative h-[780px] overflow-hidden sm:h-[800px]">
+            <Image src={hero} alt="Hands shaping clay on a pottery wheel" fill priority placeholder="blur" sizes="100vw" className="object-cover object-[60%_45%]" />
+            <div className="absolute inset-0 bg-black/60" />
+            <div className="relative mx-auto flex h-full max-w-[1200px] flex-col justify-center px-6 pb-24 pt-16 sm:pb-36">
+              <Reveal>
+                <p className="font-mono text-sm text-text/70">For Etsy sellers shipping to Germany</p>
+              </Reveal>
+              <Reveal delay={0.05}>
+                <h1 className="mt-5 max-w-3xl text-[40px] font-semibold leading-[1.05] tracking-[-0.035em] sm:text-[64px]">
+                  Etsy translated your listing. Here&apos;s what German buyers read.
+                </h1>
+              </Reveal>
+              <Reveal delay={0.1}>
+                <p className="mt-6 max-w-xl text-[17px] leading-relaxed text-text/80">
+                  Lokvane finds the mistakes in Etsy&apos;s auto-translation, fixes the listing, and learns the German market from independent
+                  evaluator verdicts.
+                </p>
+              </Reveal>
+              <Reveal delay={0.15}>
+                <div className="mt-9 flex flex-wrap gap-3">
+                  <PrimaryLink href="/app">Check a listing</PrimaryLink>
+                  <SecondaryLink href="/#results">See the results</SecondaryLink>
+                </div>
+              </Reveal>
             </div>
-            <Field label="English original" value={original} onChange={setOriginal} />
-            <Field label="Etsy auto-translation (German)" value={machine} onChange={setMachine} />
-            <button onClick={run} disabled={busy} className="w-full rounded bg-[#1d1b18] px-4 py-3 text-sm font-medium text-[#f6f3ee] disabled:opacity-60">
-              {phase === "fixing" && "SERV Reasoning is checking the translation…"}
-              {phase === "reviewing" && `Reppo panel reviewing both versions · ${elapsed}s`}
-              {phase === "learning" && "Turning Reppo critiques into playbook rules…"}
-              {(phase === "idle" || phase === "done") && "Check and fix for Germany"}
-            </button>
-            {error && <p className="rounded border border-[#c2410c]/40 bg-[#c2410c]/5 p-3 text-sm text-[#c2410c]">{error}</p>}
-            <p className="text-xs text-[#1d1b18]/50">Sample listings are written for this tool and are not real shops. Reppo evaluations are public, so only paste public listing text.</p>
           </div>
 
-          <div className="space-y-4">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-[#1d1b18]/60">What the translation got wrong</h2>
-            {!fix && <Empty text={busy ? "Checking…" : "Run a check to see each error, why it matters to a German buyer, and the fix."} />}
-            {fix && (
-              <ul className="space-y-2">
-                {fix.errors.map((e, i) => (
-                  <li key={i} className="rounded border border-[#1d1b18]/10 bg-white p-3 text-sm">
-                    <div><span className="text-[#c2410c] line-through">{e.machine}</span> <span className="mx-1 text-[#1d1b18]/40">→</span> <span className="font-medium text-[#15803d]">{e.fix}</span></div>
-                    <p className="mt-1 text-[#1d1b18]/70">{e.problem}</p>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {fix && (
-              <div className="rounded border border-[#1d1b18]/10 bg-white p-4 text-sm">
-                <p className="text-xs uppercase tracking-wide text-[#1d1b18]/50">Corrected listing</p>
-                <p className="mt-2 font-medium">{fix.fixed.title}</p>
-                <p className="mt-2 whitespace-pre-line text-[#1d1b18]/80">{fix.fixed.description}</p>
-                <div className="mt-3 flex flex-wrap gap-1">{fix.fixed.tags.map((t) => <span key={t} className="rounded bg-[#1d1b18]/5 px-2 py-0.5 text-xs">{t}</span>)}</div>
-                <p className="mt-3 text-xs text-[#1d1b18]/50">Applied {fix.rulesUsed} playbook rule{fix.rulesUsed === 1 ? "" : "s"} · SERV Reasoning, {fix.model}</p>
+          {/* App window with a recorded run */}
+          <div className="relative mx-auto -mt-28 max-w-[1120px] px-4 sm:-mt-36 sm:px-6">
+            <Reveal delay={0.2}>
+              <div className="overflow-hidden rounded-2xl border border-line-2 bg-panel shadow-[0_40px_80px_-20px_rgba(0,0,0,0.75)]">
+                <div className="flex items-center justify-between gap-4 border-b border-line px-5 py-3">
+                  <div className="flex items-center gap-3 text-sm">
+                    <span className="font-medium">lokvane</span>
+                    <span className="text-faint">Germany</span>
+                  </div>
+                  <span className="rounded-md border border-line bg-panel-2 px-2 py-1 font-mono text-[11px] text-muted">Recorded run, round {run.round}. Explanations shortened</span>
+                </div>
+                <div className="grid md:grid-cols-[0.85fr_1.15fr]">
+                  <div className="space-y-5 border-b border-line p-5 md:border-b-0 md:border-r">
+                    <div>
+                      <p className="font-mono text-xs text-faint">English listing</p>
+                      <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted">{run.original}</p>
+                    </div>
+                    <div>
+                      <p className="font-mono text-xs text-faint">Etsy auto-translation</p>
+                      <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted">{run.machine}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line">
+                      <div className="bg-panel-2 p-4">
+                        <p className="font-mono text-xs text-faint">Etsy</p>
+                        <p className="mt-1 font-mono text-3xl font-semibold tabular-nums text-muted">{run.baselineScore}</p>
+                      </div>
+                      <div className="bg-panel-2 p-4">
+                        <p className="font-mono text-xs text-faint">Lokvane</p>
+                        <p className="mt-1 flex items-baseline gap-2 font-mono text-3xl font-semibold tabular-nums">
+                          {run.fixScore}
+                          <span className="rounded bg-ok-soft px-1.5 py-0.5 text-xs font-medium text-ok">+{run.fixScore - run.baselineScore}</span>
+                        </p>
+                      </div>
+                    </div>
+                    <p className="font-mono text-[11px] leading-relaxed text-faint">Reppo scores out of 100 · eval {run.fixEvalId}</p>
+                  </div>
+                  <div className="p-5">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium">What the translation got wrong</p>
+                      <span className="rounded-md bg-err-soft px-2 py-0.5 font-mono text-[11px] text-err">{run.errors.length} errors</span>
+                    </div>
+                    <ul className="mt-4 divide-y divide-line">
+                      {run.errors.map((e) => (
+                        <li key={e.machine} className="py-3 first:pt-0 last:pb-0">
+                          <p className="text-[15px] leading-snug">
+                            <span className="text-err line-through decoration-err/50">{e.machine}</span>
+                            <span className="mx-2 text-faint">→</span>
+                            <span className="text-ok">{e.fix}</span>
+                          </p>
+                          <p className="mt-1 text-sm leading-relaxed text-faint">{e.problem}</p>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-4 border-t border-line pt-3 font-mono text-[11px] text-faint">
+                      {run.rulesUsed} playbook rules applied · SERV Reasoning · {run.model}
+                    </p>
+                  </div>
+                </div>
               </div>
-            )}
+            </Reveal>
           </div>
         </section>
 
-        <section className="mt-10 grid gap-4 md:grid-cols-2">
-          <ScoreCard title="Etsy auto-translation" v={baseline} />
-          <ScoreCard title="Lokvane fix" v={lokvane} delta={baseline?.score != null && lokvane?.score != null ? lokvane.score - baseline.score : null} />
-        </section>
-
-        <section className="mt-10 grid gap-6 md:grid-cols-[1fr_1.2fr]">
-          <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-[#1d1b18]/60">Germany playbook · {playbook.length} rules</h2>
-            <p className="mt-1 text-xs text-[#1d1b18]/50">Each rule came from a Reppo evaluator critique. The ID shows which verdict taught it.</p>
-            {playbook.length === 0 && <div className="mt-3"><Empty text="No rules yet. The first check will start the playbook." /></div>}
-            <ol className="mt-3 space-y-2">
-              {playbook.map((r) => (
-                <li key={r.id} className={`rounded border p-3 text-sm transition ${addedIds.has(r.id) ? "border-[#15803d]/50 bg-[#15803d]/5" : "border-[#1d1b18]/10 bg-white"}`}>
-                  <p>{r.text}</p>
-                  <p className="mt-1 font-mono text-xs text-[#1d1b18]/50">Reppo {r.sourceEvalId}{addedIds.has(r.id) ? " · new" : ""}</p>
+        {/* Problem */}
+        <section className="mx-auto mt-32 grid max-w-[1200px] items-center gap-12 px-6 md:grid-cols-2">
+          <Reveal>
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-line">
+              <Image src={glassware} alt="Crystal glassware on a set table" fill placeholder="blur" sizes="(min-width: 768px) 560px, 100vw" className="object-cover" />
+            </div>
+          </Reveal>
+          <Reveal delay={0.05}>
+            <SectionHead strong="Every listing is translated. Nobody checks it." rest="Etsy machine-translates each listing into the buyer's language, and most sellers can't read the result." />
+            <p className="mt-5 text-[16px] leading-relaxed text-muted">
+              Sellers report sets that changed era, product names turned into unrelated words, and English titles replaced outright. Etsy
+              itself says hand-made translations read better and rank better in local search.
+            </p>
+            <ul className="mt-8 divide-y divide-line border-y border-line">
+              {EXAMPLES.map((x) => (
+                <li key={x.en} className="grid grid-cols-[1fr_auto] items-baseline gap-4 py-4 text-sm">
+                  <span>
+                    <span className="text-muted">{x.en}</span>
+                    <span className="mx-2 text-faint">→</span>
+                    <span className="text-err">{x.de}</span>
+                  </span>
+                  <span className="text-right text-faint">reads as {x.reads}</span>
                 </li>
               ))}
-            </ol>
-          </div>
-          <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-[#1d1b18]/60">Rounds</h2>
-            <p className="mt-1 text-xs text-[#1d1b18]/50">Reppo score for the auto-translation (light) and the Lokvane fix (dark), per listing.</p>
-            {rounds.length === 0 && <div className="mt-3"><Empty text="No rounds yet." /></div>}
-            <div className="mt-3 space-y-3">
-              {rounds.map((r) => (
-                <div key={r.round} className="rounded border border-[#1d1b18]/10 bg-white p-3 text-sm">
-                  <div className="flex justify-between gap-2"><span className="truncate">#{r.round} {r.listingTitle}</span><span className="shrink-0 text-xs text-[#1d1b18]/50">{r.rulesUsed} rules in use</span></div>
-                  <Bar value={r.baselineScore} light id={r.baselineEvalId} />
-                  <Bar value={r.fixScore} id={r.fixEvalId} />
+            </ul>
+          </Reveal>
+        </section>
+
+        {/* How it works */}
+        <section className="mx-auto mt-36 max-w-[1200px] px-6">
+          <Reveal>
+            <SectionHead id="how" strong="A localizer that learns from someone else." rest="Every lesson comes from an independent panel, not from the model that made the mistake." />
+          </Reveal>
+          <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
+            {STEPS.map((s, i) => (
+              <Reveal key={s.title} delay={i * 0.05}>
+                <div className="h-full bg-bg p-6">
+                  <div className="flex items-center justify-between">
+                    <s.icon className="h-5 w-5 text-muted" strokeWidth={1.75} />
+                    <span className="font-mono text-xs text-faint">0{i + 1}</span>
+                  </div>
+                  <p className="mt-8 text-[15px] leading-relaxed">
+                    <span className="font-medium text-text">{s.title}</span> <span className="text-muted">{s.body}</span>
+                  </p>
                 </div>
-              ))}
+              </Reveal>
+            ))}
+          </div>
+          <Reveal>
+            <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-line bg-panel p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-mono text-xs text-faint">A rule from the Germany playbook</p>
+                <p className="mt-2 text-[15px] leading-relaxed">{sampleRule.text}</p>
+              </div>
+              <p className="shrink-0 font-mono text-[11px] text-faint">Taught by Reppo eval<br className="hidden sm:block" /> {sampleRule.sourceEvalId}</p>
             </div>
+          </Reveal>
+        </section>
+
+        {/* Results */}
+        <section className="mx-auto mt-36 max-w-[1200px] px-6">
+          <Reveal>
+            <SectionHead id="results" strong="Same listing, more rules, better score" rest={`${rounds.length} recorded rounds, scored by the Reppo panel out of 100`} />
+          </Reveal>
+          <Reveal>
+            <div className="mt-10 rounded-2xl border border-line bg-panel p-6 sm:p-8">
+              <RoundsChart rounds={rounds} />
+            </div>
+          </Reveal>
+          <div className="mt-6 grid gap-6 md:grid-cols-2">
+            {[
+              { name: "Crystal glassware set", a: r1, b: r5 },
+              { name: "Sterling silver ring", a: r2, b: r6 },
+            ].map((l, i) => (
+              <Reveal key={l.name} delay={i * 0.05}>
+                <div className="rounded-2xl border border-line bg-panel p-6">
+                  <p className="text-sm text-muted">{l.name}, fixed twice from identical input</p>
+                  <div className="mt-4 flex items-end gap-6">
+                    <div>
+                      <p className="font-mono text-4xl font-semibold tabular-nums text-faint">{l.a.fixScore}</p>
+                      <p className="mt-1 text-xs text-faint">round {l.a.round} · {l.a.rulesUsed} rules</p>
+                    </div>
+                    <span className="pb-6 text-faint">→</span>
+                    <div>
+                      <p className="font-mono text-4xl font-semibold tabular-nums">{l.b.fixScore}</p>
+                      <p className="mt-1 text-xs text-muted">round {l.b.round} · {l.b.rulesUsed} rules</p>
+                    </div>
+                  </div>
+                  <p className="mt-5 font-mono text-[11px] leading-relaxed text-faint">Reppo {l.a.fixEvalId}<br />Reppo {l.b.fixEvalId}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+          <Reveal>
+            <p className="mt-6 max-w-3xl text-sm leading-relaxed text-faint">
+              Reppo scores vary between runs: the same Etsy translation scored 76 once and 45 another time. Comparing fixes of the same listing
+              is the fairer measure, and it doesn&apos;t always go up: the candle listing scored 95 in round 3 and 93 in round 7. Every eval ID is in the{" "}
+              <a href={`${REPO_URL}/tree/main/proof`} className="text-muted underline decoration-line-2 underline-offset-4 transition hover:text-text">proof data</a>.
+            </p>
+          </Reveal>
+        </section>
+
+        {/* Who it's for */}
+        <section className="mx-auto mt-36 grid max-w-[1200px] items-center gap-12 px-6 md:grid-cols-[0.8fr_1.2fr]">
+          <Reveal>
+            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-line">
+              <Image src={candles} alt="Hands holding a handmade candle in a glass jar" fill placeholder="blur" sizes="(min-width: 768px) 460px, 100vw" className="object-cover" />
+            </div>
+          </Reveal>
+          <Reveal delay={0.05}>
+            <SectionHead strong="Made for sellers who ship abroad" rest="If you can't read the language your listing is shown in, Lokvane reads it for you." />
+            <ul className="mt-8 divide-y divide-line border-y border-line text-[15px]">
+              <li className="py-4"><span className="text-text">Handmade and vintage.</span> <span className="text-muted">Ceramics, candles, jewelry, prints, vintage finds.</span></li>
+              <li className="py-4"><span className="text-text">One market at a time.</span> <span className="text-muted">Germany first, with its own playbook.</span></li>
+              <li className="py-4"><span className="text-text">Nothing to set up.</span> <span className="text-muted">No account and no shop connection. Paste, check, copy the fix.</span></li>
+            </ul>
+          </Reveal>
+        </section>
+
+        {/* Built on */}
+        <section className="mx-auto mt-36 max-w-[1200px] px-6">
+          <Reveal>
+            <SectionHead strong="Built on two independent systems" rest="One writes, the other judges" />
+          </Reveal>
+          <div className="mt-10 divide-y divide-line border-y border-line">
+            {[
+              { name: "SERV Reasoning by OpenServ", body: "Writes every fix and every playbook rule. Each call is schema-forced, so the app always gets the exact error list and rules it expects.", href: "https://docs.openserv.ai/serv-reasoning/introduction.md" },
+              { name: "Reppo Evaluation API", body: "Provides every score and every lesson. An independent panel judges both versions, and its critiques are the only thing Lokvane learns from.", href: "https://eval.reppo.xyz/agents.md" },
+            ].map((s) => (
+              <Reveal key={s.name}>
+                <a href={s.href} className="group grid gap-2 py-6 sm:grid-cols-[280px_1fr_auto] sm:items-center sm:gap-8">
+                  <span className="font-medium">{s.name}</span>
+                  <span className="text-[15px] leading-relaxed text-muted">{s.body}</span>
+                  <ArrowUpRight className="hidden h-4 w-4 text-faint transition group-hover:text-text sm:block" />
+                </a>
+              </Reveal>
+            ))}
           </div>
         </section>
 
-        <footer className="mt-12 border-t border-[#1d1b18]/15 pt-4 text-xs text-[#1d1b18]/50">
-          Fixes by SERV Reasoning (OpenServ). Scores by the Reppo Evaluation API panel, never by Lokvane itself.
-        </footer>
-      </div>
-    </main>
-  );
-}
-
-function Field({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
-  return (
-    <label className="block text-sm">
-      <span className="text-[#1d1b18]/70">{label}</span>
-      <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={5} className="mt-1 w-full rounded border border-[#1d1b18]/20 bg-white p-3 font-mono text-xs leading-relaxed" />
-    </label>
-  );
-}
-
-function Empty({ text }: { text: string }) {
-  return <p className="rounded border border-dashed border-[#1d1b18]/20 p-4 text-sm text-[#1d1b18]/50">{text}</p>;
-}
-
-function ScoreCard({ title, v, delta }: { title: string; v: Verdict | null; delta?: number | null }) {
-  const done = v?.status === "COMPLETED";
-  return (
-    <div className="rounded border border-[#1d1b18]/10 bg-white p-5">
-      <p className="text-xs uppercase tracking-wide text-[#1d1b18]/50">{title}</p>
-      <div className="mt-2 flex items-baseline gap-3">
-        <span className="text-4xl font-semibold tabular-nums">{done ? v.score : "—"}</span>
-        <span className="text-sm text-[#1d1b18]/50">/ 100 Reppo score</span>
-        {delta != null && <span className={`ml-auto text-sm font-medium ${delta >= 0 ? "text-[#15803d]" : "text-[#c2410c]"}`}>{delta >= 0 ? "+" : ""}{delta}</span>}
-      </div>
-      {v && <p className="mt-2 text-xs text-[#1d1b18]/60">{done ? `${v.decision} · ${v.confidence} confidence · route ${v.route}` : v.status.toLowerCase()}</p>}
-      {done && v.reason && <p className="mt-2 text-sm text-[#1d1b18]/75">{v.reason}</p>}
-      {v && <p className="mt-2 font-mono text-xs text-[#1d1b18]/50">Reppo eval {v.evalId}</p>}
-    </div>
-  );
-}
-
-function Bar({ value, light, id }: { value: number | null; light?: boolean; id: string }) {
-  return (
-    <div className="mt-2 flex items-center gap-2" title={`Reppo eval ${id}`}>
-      <div className="h-2 flex-1 rounded bg-[#1d1b18]/5">
-        <div className={`h-2 rounded ${light ? "bg-[#1d1b18]/25" : "bg-[#1d1b18]"}`} style={{ width: `${value ?? 0}%` }} />
-      </div>
-      <span className="w-8 text-right text-xs tabular-nums">{value ?? "—"}</span>
-      <span className="w-24 truncate font-mono text-[10px] text-[#1d1b18]/40">{shortId(id)}</span>
-    </div>
-  );
-}
-
-function Stamp({ market, label, accepted }: { market: string; label: string; accepted: boolean }) {
-  return (
-    <div className={`flex h-20 w-20 rotate-[-6deg] flex-col items-center justify-center rounded-full border-2 text-center transition ${accepted ? "border-[#15803d] text-[#15803d]" : "border-[#1d1b18]/30 text-[#1d1b18]/40"}`}>
-      <span className="text-xl font-bold leading-none">{market}</span>
-      <span className="mt-1 text-[10px] uppercase tracking-wider">{accepted ? "accepted" : label}</span>
-    </div>
+        {/* Final CTA */}
+        <section className="mx-auto mb-24 mt-36 max-w-[1200px] px-6">
+          <Reveal>
+            <div className="relative overflow-hidden rounded-3xl border border-line">
+              <Image src={shelf} alt="A shelf of lit candles" fill placeholder="blur" sizes="(min-width: 1200px) 1152px, 100vw" className="object-cover" />
+              <div className="absolute inset-0 bg-black/60" />
+              <div className="relative flex flex-col items-start gap-6 px-8 py-20 sm:px-14 sm:py-24">
+                <h2 className="max-w-xl text-3xl font-semibold leading-tight tracking-[-0.03em] sm:text-[44px]">Check what your German buyers see</h2>
+                <p className="max-w-md text-text/75">No account. Paste a listing and Etsy&apos;s translation, and get the fix in seconds.</p>
+                <PrimaryLink href="/app">Check a listing</PrimaryLink>
+              </div>
+            </div>
+          </Reveal>
+        </section>
+      </main>
+      <Footer />
+    </>
   );
 }

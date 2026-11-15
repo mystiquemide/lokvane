@@ -2,7 +2,7 @@
 
 Lokvane finds what Etsy's auto-translation got wrong in each market, fixes the listing, and learns that market's rules from independent Reppo verdicts. Each listing comes out better than the one before it.
 
-**Live app:** https://lokvane.midelabs.xyz
+**Live app:** https://lokvane.midelabs.xyz (product page) · https://lokvane.midelabs.xyz/app (the tool)
 **Demo video:** _link added at submission_
 **X post:** _link added at submission_
 **Track:** Reppo (SERV Hackathon Edition 02 by OpenServ)
@@ -80,9 +80,9 @@ We haven't validated pricing with paying users. The points above are a model, no
 
 ## Measured results (proof run, November 15, 2026)
 
-Six rounds were run live against SERV Reasoning and the Reppo Evaluation API. Each round scored Etsy's auto-translation and the Lokvane fix for the same listing. Every score below is a real Reppo verdict, and each eval ID can be looked up.
+Seven rounds were run live against SERV Reasoning and the Reppo Evaluation API. Each round scored Etsy's auto-translation and the Lokvane fix for the same listing. Every score below is a real Reppo verdict, and each eval ID can be looked up.
 
-| Round | Listing (sample) | Playbook rules in use | Auto-translation score | Lokvane fix score | Gain | Reppo eval IDs (auto / fix) |
+| Round | Listing (example) | Playbook rules in use | Auto-translation score | Lokvane fix score | Gain | Reppo eval IDs (auto / fix) |
 |---|---|---|---|---|---|---|
 | 1 | Vintage 19-piece glassware set | 0 | 76 | 80 | +4 | `cmwi4mrur000207l2oatnwmyg` / `cmwi4mrfv000207jvgyrsvixb` |
 | 2 | Sterling silver stacking ring | 3 | 74 | 76 | +2 | `cmwi4vhgk000d07jvpen7an6s` / `cmwi4vhib000e07jv705wmwaq` |
@@ -90,16 +90,18 @@ Six rounds were run live against SERV Reasoning and the Reppo Evaluation API. Ea
 | 4 | Botanical wall art print | 8 | 73 | 92 | +19 | `cmwi5ochi000107l5vols0yb3` / `cmwi5ocgp000007l5c8nksrp9` |
 | 5 | Vintage 19-piece glassware set (repeat) | 11 | 45 | 100 | +55 | `cmwi5qb4z000008kxpz3yh7zg` / `cmwi5qaql000207l5em65kv5t` |
 | 6 | Sterling silver stacking ring (repeat, run on production) | 12 | 40 | 94 | +54 | `cmwi6gwvd000408kx9q5vi3mi` / `cmwi6gwuv000308kx3n7wn825` |
+| 7 | Hand-poured soy candle (repeat) | 12 | 63 | 93 | +30 | `cmwi817a8000108l22hb637sz` / `cmwi817ay000208l2q3gyhfx0` |
 
 Raw data: [proof/rounds-de.json](proof/rounds-de.json) and [proof/playbook-de.json](proof/playbook-de.json).
 
 **What this shows:**
 - Two listings were fixed twice from the same input. Glassware: **80** with an empty playbook, **100** with 11 learned rules. Ring: **76** with 3 rules, **94** with 12 rules.
-- Rounds with 5 or more rules (rounds 3 to 6) beat the auto-translation by 18 to 55 points. Rounds with 0 to 3 rules beat it by 2 to 4.
+- Rounds with 5 or more rules (rounds 3 to 7) beat the auto-translation by 18 to 55 points. Rounds with 0 to 3 rules beat it by 2 to 4.
 
 **What it does not show:**
 - Reppo scores vary between runs. The identical glassware auto-translation scored 76 in round 1 and 45 in round 5, and the identical ring auto-translation scored 74 then 40, so part of the large gaps in rounds 5 and 6 comes from the panel, not from Lokvane. The fix-to-fix comparisons on the same listing (80 → 100 and 76 → 94) are the cleaner signal.
-- Six rounds is a small sample. Reppo scores measure evaluator-judged listing quality, not sales.
+- The candle listing was also fixed twice and did not improve: 95 with 5 rules in round 3, 93 with 12 rules in round 7. More rules don't guarantee a higher score on every listing.
+- Seven rounds is a small sample. Reppo scores measure evaluator-judged listing quality, not sales.
 
 ---
 
@@ -160,39 +162,46 @@ English listing + Etsy auto-translation
 
 ## Screens
 
+### Product page
+
+![Lokvane product page: hero with a recorded round 6 fix, errors and Reppo scores](docs/screens/00-landing.png)
+
+The product page at `/` opens with the problem and shows a real recorded run in the hero: production round 6, the ring listing, with the 6 errors SERV Reasoning found and the Reppo scores of 40 for Etsy's version and 94 for the fix. The data comes from [proof/round-6-ring-fix.json](proof/round-6-ring-fix.json). Further down: the problem with real examples, how the loop works with a real playbook rule, a chart of all seven recorded rounds, and the sponsor stack.
+
 ### 1. Errors and the corrected listing
 
 ![Lokvane: errors found in Etsy's German auto-translation, with fixes and the corrected listing](docs/screens/01-errors-and-fix.png)
 
-Left: the English original and Etsy's German auto-translation as pasted by the seller (sample listing). Right: every error SERV Reasoning found. The machine's phrase is struck through in red, the correction is in green, and below each one is a plain-English explanation of why it would mislead or put off a German buyer. Below the errors is the full corrected listing, ready to paste into Etsy: German title, description and 13 local search tags. The footer line shows how many playbook rules were applied and which SERV Reasoning model was used.
+The tool at `/app`. Left: the English original and Etsy's German auto-translation as pasted by the seller (example listing). Right: every error SERV Reasoning found. The machine's phrase is struck through in red, the correction is in green, and below each one is a plain-English explanation of why it would mislead or put off a German buyer. Below the errors is the full corrected listing, ready to paste into Etsy: German title, description and 13 local search tags. The footer line shows how many playbook rules were applied and which SERV Reasoning model was used.
 
 ### 2. Reppo panel reviewing
 
 ![Lokvane while the Reppo evaluator panel is reviewing both versions](docs/screens/02-reviewing.png)
 
-After the fix, both versions go to Reppo. The button shows the live state and elapsed time while the independent panel reviews.
+After the fix, both versions go to Reppo. The three-step progress rail at the top shows where the run is (find errors, independent verdict, learn rules), with elapsed seconds while the panel reviews.
 
 ### 3. Independent scores, side by side
 
 ![Reppo scores for Etsy's auto-translation and the Lokvane fix, with eval IDs](docs/screens/03-reppo-scores.png)
 
-Left: Reppo's score for Etsy's auto-translation. Right: Reppo's score for the Lokvane fix, with the point difference. Each card shows Reppo's decision, confidence, recommended route and written reason, plus the full Reppo eval ID so the verdict can be checked.
+Left: Reppo's score for Etsy's auto-translation. Right: Reppo's score for the Lokvane fix, with the point difference. Each card shows Reppo's decision, confidence, recommended route and written reason, plus the full Reppo eval ID so the verdict can be checked. The score counts up when the verdict lands, and the Germany stamp turns green when Reppo accepts the fix.
 
 ### 4. Learned playbook and round history
 
 ![Germany playbook rules with source Reppo eval IDs, and round history with scores](docs/screens/04-playbook-and-rounds.png)
 
-Left: the Germany playbook. Each rule came from a Reppo evaluator critique and shows the eval ID that taught it. Rules learned in the latest round are highlighted. Right: every round so far, with the listing, how many rules were in use, and two bars per round: the auto-translation score (light) and the Lokvane fix score (dark), each with its Reppo eval ID.
+Left: the Germany playbook. Each rule came from a Reppo evaluator critique and shows the eval ID that taught it. Rules learned in the latest round are highlighted. Right: every round so far, with the listing, how many rules were in use, and two bars per round: the auto-translation score (grey) and the Lokvane fix score (white), with Reppo eval IDs on hover. Newest round first.
 
 ---
 
 ## Judge path (5 minutes)
 
-1. **Open the live app:** https://lokvane.midelabs.xyz. The playbook and round history from the proof run load right away.
-2. **Check the proof:** look at the round history (bottom right). Fix scores rise as more rules are in use. The same glassware listing goes from 80 to 100, and the same ring listing from 76 to 94. Every bar has a Reppo eval ID.
-3. **Trace one rule:** pick a playbook rule (bottom left), note its Reppo eval ID, and find that ID in [proof/rounds-de.json](proof/rounds-de.json). It's the round whose critique produced the rule.
-4. **Run it yourself:** pick a sample listing from the dropdown, or paste your own English listing and a German translation, then press **Check and fix for Germany**. The errors appear in a few seconds. The Reppo verdicts take 1 to 7 minutes, then new rules appear, highlighted.
-5. **Check the sponsor code:** SERV Reasoning in [lib/serv.ts](lib/serv.ts) and [app/api/fix/route.ts](app/api/fix/route.ts). Reppo in [lib/reppo.ts](lib/reppo.ts) and [app/api/evaluate/route.ts](app/api/evaluate/route.ts). The learning loop in [app/api/learn/route.ts](app/api/learn/route.ts).
+1. **Open the product page:** https://lokvane.midelabs.xyz. The hero shows a real recorded run, and the results chart plots all seven rounds.
+2. **Open the tool:** https://lokvane.midelabs.xyz/app. The playbook and round history from the proof run load right away.
+3. **Check the proof:** look at the round history (bottom right). Fix scores rise as more rules are in use. The same glassware listing goes from 80 to 100, and the same ring listing from 76 to 94. Every bar has a Reppo eval ID.
+4. **Trace one rule:** pick a playbook rule (bottom left), note its Reppo eval ID, and find that ID in [proof/rounds-de.json](proof/rounds-de.json). It's the round whose critique produced the rule.
+5. **Run it yourself:** pick an example listing from the dropdown, or paste your own English listing and a German translation, then press **Check and fix for Germany**. The errors appear in a few seconds. The Reppo verdicts take 1 to 7 minutes, then new rules appear, highlighted.
+6. **Check the sponsor code:** SERV Reasoning in [lib/serv.ts](lib/serv.ts) and [app/api/fix/route.ts](app/api/fix/route.ts). Reppo in [lib/reppo.ts](lib/reppo.ts) and [app/api/evaluate/route.ts](app/api/evaluate/route.ts). The learning loop in [app/api/learn/route.ts](app/api/learn/route.ts).
 
 ---
 
@@ -206,9 +215,10 @@ Left: the Germany playbook. Each rule came from a Reppo evaluator critique and s
 | Evaluate API | `app/api/evaluate/` | Submits a listing to Reppo and polls the verdict |
 | Learn API | `app/api/learn/route.ts` | Turns Reppo critiques into rules with source eval IDs and logs the round |
 | State API and store | `app/api/state/route.ts`, `lib/store.ts` | Playbook and round history per market, seeded from the proof run |
-| Web app | `app/page.tsx` | Single-screen UI: input, error diff, corrected listing, score cards, playbook, round history |
+| Product page | `app/page.tsx`, `components/` | Landing page built from the proof data: recorded run in the hero, results chart, sponsor stack, branded 404 |
+| Tool | `app/app/page.tsx` | Input, progress rail, error diff, corrected listing with copy, score cards, playbook, round history |
 | Markets | `lib/markets.ts` | Market config (Germany live, France and Japan defined) |
-| Sample listings | `lib/samples.json` | Four sample Etsy-style listings with machine translations containing error types sellers report. These are written for testing and are not real shops |
+| Example listings | `lib/samples.json` | Four example Etsy-style listings with machine translations containing error types sellers report. These are written for testing and are not real shops |
 | Request guards | `lib/guard.ts` | Per-IP rate limits, input size limits, error codes, and serialized writes to the playbook |
 | Tests and CI | `tests/`, `.github/workflows/ci.yml` | Unit tests for the Reppo critique parsing and guards, run in CI with typecheck and build |
 | Round runner | `scripts/round.mjs` | Runs a full round (fix, two Reppo evaluations, learn) against any deployment from the command line |
@@ -221,7 +231,9 @@ Left: the Germany playbook. Each rule came from a Reppo evaluator critique and s
 - **[Reppo Evaluation API](https://eval.reppo.xyz/agents.md)**: independent scoring and the critiques the agent learns from
 - **Next.js 16** (App Router, Turbopack) and **React 19**
 - **TypeScript 5**
-- **Tailwind CSS 4**
+- **Tailwind CSS 4**, Inter and JetBrains Mono
+- **Motion** for reveals and score animations, **Lucide** icons
+- Photography from **Unsplash** (Yasin Onus, Guillaume de Germain, Frames For Your Heart, Seiya Maeda), credited in the footer
 - **OpenAI Node SDK**, pointed at SERV Reasoning
 - **Docker** (Node 22) and **Dokploy** for deployment, with Let's Encrypt HTTPS
 
@@ -310,7 +322,7 @@ These guards were checked against a production build:
 - **Shared playbook.** The live demo has one Germany playbook for all visitors. Per-seller playbooks would come with accounts.
 - **Older rules rotate out.** Rules learned in rounds 1 and 2 have already left the 12-rule cap. Their text stays in the round log.
 - **Some rules overlap.** The rule learner skips rules already in the playbook, but similar wording can still slip through. The playbook is capped at 12 rules, and the oldest drop off first.
-- **Sample listings.** The four built-in listings were written for testing and are labeled as samples in the UI. The errors in them are types sellers report, not copies of specific real listings.
+- **Example listings.** The four built-in listings were written for testing and are labeled as such in the UI. The errors in them are types sellers report, not copies of specific real listings.
 
 ## Submission checklist
 
