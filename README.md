@@ -3,7 +3,7 @@
 Lokvane finds what Etsy's auto-translation got wrong in each market, fixes the listing, and learns that market's rules from independent Reppo verdicts. Each listing comes out better than the one before it.
 
 **Live app:** https://lokvane.midelabs.xyz (product page) · https://lokvane.midelabs.xyz/check (the tool)
-**Demo video:** _link added at submission_
+**Demo video:** https://youtu.be/Xb878du-ue8
 **X post:** _link added at submission_
 **Track:** Reppo (SERV Hackathon Edition 02 by OpenServ)
 
@@ -334,7 +334,7 @@ These guards were checked against a production build:
 
 - [x] Public code repository (this repo)
 - [x] Live demo link: https://lokvane.midelabs.xyz
-- [ ] Demo video: _link added at submission_
+- [x] Demo video: https://youtu.be/Xb878du-ue8
 - [x] Write-up: what Lokvane does (The solution), how it uses SERV Reasoning (How SERV Reasoning is used), track entered (Tracks), what was built during the hackathon (About, What we built)
 - [ ] X post: _link added at submission_
 - [x] SERV Reasoning is part of the build
