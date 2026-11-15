@@ -3,16 +3,24 @@ import { getEval, critiques } from "@/lib/reppo";
 import { servJSON, RULES_SCHEMA } from "@/lib/serv";
 import { getPlaybook, savePlaybook, getRounds, saveRounds, type Rule } from "@/lib/store";
 import { market } from "@/lib/markets";
+import { rateLimit, errorResponse, serialized, HttpError } from "@/lib/guard";
 
 const MAX_RULES = 12;
 
 export async function POST(req: Request) {
   try {
+    rateLimit(req, "learn", 10, 10 * 60_000);
     const { marketKey, listingTitle, baselineEvalId, fixEvalId, rulesUsed } = await req.json();
     const m = market(marketKey);
+    if (typeof baselineEvalId !== "string" || typeof fixEvalId !== "string" || baselineEvalId === fixEvalId) {
+      throw new HttpError(400, "baselineEvalId and fixEvalId must be two different Reppo eval ids");
+    }
     const [base, fix] = await Promise.all([getEval(baselineEvalId), getEval(fixEvalId)]);
     if (base.status !== "COMPLETED" || fix.status !== "COMPLETED") {
-      return NextResponse.json({ error: "Both Reppo evaluations must be COMPLETED" }, { status: 409 });
+      throw new HttpError(409, "Both Reppo evaluations must be COMPLETED");
+    }
+    if ((await getRounds(marketKey)).some((r) => r.fixEvalId === fix.id || r.baselineEvalId === base.id)) {
+      throw new HttpError(409, "This round was already learned from");
     }
     const rules = await getPlaybook(marketKey);
     const notes = [
@@ -29,9 +37,12 @@ Each rule: "text" is one imperative sentence, "sourceEvalId" is the exact eval i
       .filter((r) => r.text && valid.has(r.sourceEvalId))
       .slice(0, 3)
       .map((r) => ({ id: crypto.randomUUID().slice(0, 8), text: r.text.trim(), sourceEvalId: r.sourceEvalId, createdAt: new Date().toISOString() }));
-    const next = [...rules, ...added].slice(-MAX_RULES);
+    return NextResponse.json(await serialized(async () => {
+    const current = await getPlaybook(marketKey);
+    const next = [...current, ...added].slice(-MAX_RULES);
     await savePlaybook(marketKey, next);
     const rounds = await getRounds(marketKey);
+    if (rounds.some((r) => r.fixEvalId === fix.id)) throw new HttpError(409, "This round was already learned from");
     rounds.push({
       round: rounds.length + 1,
       listingTitle: String(listingTitle ?? "").slice(0, 120),
@@ -44,8 +55,9 @@ Each rule: "text" is one imperative sentence, "sourceEvalId" is the exact eval i
       at: new Date().toISOString(),
     });
     await saveRounds(marketKey, rounds);
-    return NextResponse.json({ added, playbook: next, rounds });
+    return { added, playbook: next, rounds };
+    }));
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    return errorResponse(err);
   }
 }

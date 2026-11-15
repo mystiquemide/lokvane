@@ -1,14 +1,17 @@
 import { NextResponse } from "next/server";
 import { submitEval, evalInput } from "@/lib/reppo";
 import { market } from "@/lib/markets";
+import { text, rateLimit, errorResponse } from "@/lib/guard";
 
 export async function POST(req: Request) {
   try {
-    const { original, candidate, marketKey } = await req.json();
-    if (!original || !candidate) return NextResponse.json({ error: "original and candidate are required" }, { status: 400 });
-    const e = await submitEval(evalInput(market(marketKey).name, original, candidate));
+    // Each round submits two evaluations, so this allows 5 rounds per IP every 10 minutes.
+    rateLimit(req, "evaluate", 10, 10 * 60_000);
+    const body = await req.json();
+    const m = market(body.marketKey);
+    const e = await submitEval(evalInput(m.name, text(body.original, "original"), text(body.candidate, "candidate")));
     return NextResponse.json({ evalId: e.id, status: e.status });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 502 });
+    return errorResponse(err, 502);
   }
 }

@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { getEval, critiques } from "@/lib/reppo";
+import { HttpError, errorResponse } from "@/lib/guard";
 
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await ctx.params;
+    if (!/^[a-z0-9]{10,40}$/i.test(id)) throw new HttpError(400, "Invalid eval id");
     const e = await getEval(id);
     return NextResponse.json({
       evalId: e.id,
@@ -17,6 +19,6 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
       critiques: e.status === "COMPLETED" ? critiques(e) : [],
     });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 502 });
+    return errorResponse(err, 502);
   }
 }

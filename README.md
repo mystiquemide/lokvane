@@ -65,6 +65,7 @@ The hackathon judges three things: creativity, user readiness, and revenue poten
 - **One screen, one action.** Paste two texts and press one button. No account, no setup, no Etsy login.
 - **Results a seller can act on.** Each error is shown as wrong phrase → corrected phrase with a one-line explanation in English, followed by a ready-to-paste German title, description and 13 tags.
 - **Honest states.** The UI shows when the Reppo panel is reviewing (with elapsed time), failed evaluations, missing API keys, and a notice that Reppo evaluations are public.
+- **Safe to leave open to the public.** Every endpoint that spends SERV or Reppo credits is rate-limited per IP, listing fields are capped at 8,000 characters, eval IDs are validated, and a round can't be learned from twice. Each guard is covered by tests.
 
 ### Revenue potential
 
@@ -208,6 +209,8 @@ Left: the Germany playbook. Each rule came from a Reppo evaluator critique and s
 | Web app | `app/page.tsx` | Single-screen UI: input, error diff, corrected listing, score cards, playbook, round history |
 | Markets | `lib/markets.ts` | Market config (Germany live, France and Japan defined) |
 | Sample listings | `lib/samples.json` | Four sample Etsy-style listings with machine translations containing error types sellers report. These are written for testing and are not real shops |
+| Request guards | `lib/guard.ts` | Per-IP rate limits, input size limits, error codes, and serialized writes to the playbook |
+| Tests and CI | `tests/`, `.github/workflows/ci.yml` | Unit tests for the Reppo critique parsing and guards, run in CI with typecheck and build |
 | Round runner | `scripts/round.mjs` | Runs a full round (fix, two Reppo evaluations, learn) against any deployment from the command line |
 | Proof data | `proof/` | Recorded rounds and playbook from the live proof run |
 | Deployment | `Dockerfile` | Production image on Node 22, deployed with Dokploy |
@@ -273,6 +276,29 @@ Sample IDs: `glassware`, `ring`, `candle`, `print`.
 | `GET` | `/api/state?market=de` | | `{ playbook[], rounds[] }` |
 
 ---
+
+## Tests and CI
+
+```bash
+npm test
+```
+
+```bash
+npm run typecheck
+```
+
+Unit tests in [tests/core.test.ts](tests/core.test.ts) cover critique extraction from the Reppo trace, the evaluation prompt, input limits, per-IP rate limiting and serialized playbook writes. [GitHub Actions](.github/workflows/ci.yml) runs the typecheck, the tests and a production build on every push to `main`.
+
+These guards were checked against a production build:
+
+| Request | Response |
+|---|---|
+| Unknown market | `400 Unknown market` |
+| Listing field over 8,000 characters | `413` |
+| Malformed eval ID | `400 Invalid eval id` |
+| Same ID for both evaluations | `400` |
+| Learning from a round that was already logged | `409 This round was already learned from` |
+| 11th paid request from one IP within 10 minutes | `429 Too many requests` |
 
 ## Limitations
 
