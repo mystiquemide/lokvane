@@ -6,7 +6,7 @@ import { ArrowUpRight } from "lucide-react";
 import { Logo } from "./Logo";
 import { PrimaryLink } from "./Button";
 
-export const REPO_URL = "https://github.com/mystiquemide/openserv-2-hack";
+export const REPO_URL = "https://github.com/mystiquemide/lokvane";
 
 const LINKS = [
   { href: "/#how", label: "How it works" },

@@ -245,7 +245,7 @@ Left: the Germany playbook. Each rule came from a Reppo evaluator critique and s
 Requires Node 22 or newer, a SERV Reasoning API key from [console.openserv.ai](https://console.openserv.ai), and a Reppo API key from [eval.reppo.xyz/api-key](https://eval.reppo.xyz/api-key).
 
 ```bash
-git clone https://github.com/mystiquemide/openserv-2-hack.git lokvane
+git clone https://github.com/mystiquemide/lokvane.git
 ```
 
 ```bash
